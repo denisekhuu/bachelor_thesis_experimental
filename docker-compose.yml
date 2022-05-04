@@ -1,0 +1,13 @@
+# Development Environment
+version: "3"
+
+services:
+
+# Jupyter Development Server
+  bachelor_notebook:
+    build: .
+    volumes:
+      - ./src:/home/jovyan/work
+    ports:
+      - 8888:8888
+    container_name: bachelor_notebooks
