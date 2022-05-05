@@ -7,7 +7,7 @@ class Client():
     def __init__(self, configs: Configuration, train_dataloader, test_dataloader):
         """
         :param configs: experiment configurations
-        :type args: Configuration
+        :type configs: Configuration
         :param train_dataloader: Training data loader
         :type train_dataloader: torch.utils.data.DataLoader
         :param test_dataloader: Test data loader

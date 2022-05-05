@@ -17,7 +17,7 @@ class MNISTDataset(Dataset):
         train_loader = torch.utils.data.DataLoader(
             train_dataset,
             batch_size=self.configs.BATCH_SIZE_TRAIN, 
-            shuffle=False)
+            shuffle=True)
         
         print("MNIST training data loaded.")
         return train_loader, train_dataset
