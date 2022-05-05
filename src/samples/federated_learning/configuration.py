@@ -1,14 +1,18 @@
 import os
 import torch.nn as nn
 from .nets import MNISTCNN, FashionMNISTCNN
+from .dataset import MNISTDataset, FashionMNISTDataset
 from .dataloader import MNISTDataloader, FashionMNISTDataloader
-
 class Configuration():
     
     # Dataset Config
     BATCH_SIZE_TRAIN = 64
     BATCH_SIZE_TEST = 1000
+    DATASET = MNISTDataset
+    
+    # DEPRICATED CONFIG
     DATALOADER = MNISTDataloader
+    
     
     #MNIST_FASHION_DATASET Configurations
     MNIST_FASHION_DATASET_PATH = os.path.join('./data/mnist_fashion')

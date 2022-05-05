@@ -4,7 +4,7 @@ from .dataset import Dataset
 class MNISTDataset(Dataset): 
     
     def __init__(self, configs):
-        super(MNISTDataloader, self).__init__(configs)
+        super(MNISTDataset, self).__init__(configs)
         
     def load_train_data(self):
         transform = torchvision.transforms.Compose([torchvision.transforms.transforms.ToTensor()])
@@ -19,7 +19,7 @@ class MNISTDataset(Dataset):
             batch_size=self.configs.BATCH_SIZE_TRAIN, 
             shuffle=False)
         
-        print("MNIST training loader loaded.")
+        print("MNIST training data loaded.")
         return train_loader, train_dataset
     
     def load_test_data(self):
@@ -35,5 +35,5 @@ class MNISTDataset(Dataset):
             batch_size=self.configs.BATCH_SIZE_TEST, 
             shuffle=False)
         
-        print("MNIST test loader loaded.")
+        print("MNIST test data loaded.")
         return test_loader, test_dataset

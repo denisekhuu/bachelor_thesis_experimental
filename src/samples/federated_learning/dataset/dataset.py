@@ -3,15 +3,15 @@ class Dataset():
     
     def __init__(self, configs):
         self.configs = configs
-        self.train_dataloader = self.load_train_dataloader()
-        self.test_dataloader = self.load_test_dataloader()
+        self.train_dataloader, self.train_dataset = self.load_train_data()
+        self.test_dataloader, self.test_dataset  = self.load_test_data()
     
     @abstractmethod
     def load_train_data(self):
         """
         Loads & returns the training dataloader and dataset.
 
-        :return: torchvision.Dataloader, torchvision.Dataset
+        :return: torch.utils.data.Dataloader, torchvision.datasets.Dataset
         """
         raise NotImplementedError("load_train_dataloader() isn't implemented")
         
@@ -20,6 +20,6 @@ class Dataset():
         """
         Loads & returns the test dataloader and dataset. 
 
-        :return:torchvision.Dataloader, torchvision.Dataset
+        :return: torch.utils.data.Dataloader, torchvision.datasets.Dataset
         """
         raise NotImplementedError("load_test_dataloader() isn't implemented")

@@ -5,6 +5,14 @@ from .configuration import Configuration
 
 class Client(): 
     def __init__(self, configs: Configuration, train_dataloader, test_dataloader):
+        """
+        :param configs: experiment configurations
+        :type args: Configuration
+        :param train_dataloader: Training data loader
+        :type train_dataloader: torch.utils.data.DataLoader
+        :param test_dataloader: Test data loader
+        :type test_dataloader: torch.utils.data.DataLoader
+        """
         self.configs = configs
         self.net = self.configs.NETWORK()
         self.train_dataloader = train_dataloader
@@ -17,6 +25,12 @@ class Client():
         self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.configs.N_EPOCHS)]
         
     def train(self, epoch):
+        """
+        Defines the training process of a local model. train() uses as optimization algorithm Stochastic 
+        Gradient Descent (SGD) and Cross Entropy Loss as loss-function.
+        :param epoch: epoch
+        :type epoch: int
+        """
         self.net.train()
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
             self.optimizer.zero_grad()
@@ -32,6 +46,9 @@ class Client():
                 #torch.save(optimizer.state_dict(), './results/optimizer.pth')
     
     def test(self):
+        """
+        Test function to evaluate the performance of the deep learning model
+        """
         self.net.eval()
         test_loss = 0
         correct = 0

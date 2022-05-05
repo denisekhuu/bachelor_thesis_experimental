@@ -1,10 +1,10 @@
 import torch, torchvision
-from .data import Data
+from .dataset import Dataset
 
-class FashionMNISTData(Data): 
+class FashionMNISTDataset(Dataset): 
     
     def __init__(self, configs):
-        super(FashionMNISTDataloader, self).__init__(configs)
+        super(FashionMNISTDataset, self).__init__(configs)
         self.labels = self.configs.MNIST_FASHION_LABELS
         
     def load_train_data(self):
@@ -25,7 +25,7 @@ class FashionMNISTData(Data):
             shuffle=True)
         
         
-        print("FashionMnist training loader loaded.")
+        print("FashionMnist training data loaded.")
         return train_loader, train_dataset
     
     def load_test_data(self):
@@ -46,7 +46,7 @@ class FashionMNISTData(Data):
             shuffle=False)
         
         
-        print("FashionMnist training loader loaded.")
+        print("FashionMnist training data loaded.")
         return test_loader, test_dataset
 
         
