@@ -1,4 +1,3 @@
-from .client import Client
 from .configuration import Configuration
 from .dataset import Dataset
 import torch

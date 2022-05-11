@@ -35,4 +35,9 @@ class Configuration():
     
     #Local Environment Configurations
     NUMBER_OF_CLIENTS = 1
+<<<<<<< Updated upstream
+=======
+    CLIENT_TYPE = CNNClient
+    DEVICE = device('cpu')
+>>>>>>> Stashed changes
     
