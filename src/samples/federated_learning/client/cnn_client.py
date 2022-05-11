@@ -9,7 +9,8 @@ class CNNClient(Client):
     
     def __init__(self, configs, train_dataloader, test_dataloader):
         super(CNNClient, self).__init__(configs, train_dataloader, test_dataloader)
-        self.criterion = self.configs.CRITERION()
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
         
     def train(self, epoch):
         """

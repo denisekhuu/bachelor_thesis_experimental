@@ -41,6 +41,11 @@ class LocalEnvironment():
             for set in distributed_datasets
         ]
         return dataloaders
+    
+    def poison_clients(self):
+        for client in self.clients: 
+            print("{} clients poisoned".format(len(self.clients)))
+            client.label_flipping_data(from_label = 5, to_label = 3)
 
     def create_clients(self):
         """
