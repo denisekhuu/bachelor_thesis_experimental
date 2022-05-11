@@ -1,7 +1,7 @@
 import os
 import torch.nn as nn
 from torch import device
-from .nets import MNISTCNN, FashionMNISTCNN, MNISTNet
+from .nets import MNISTCNN, FashionMNISTCNN, MNISTSNN
 from .dataset import MNISTDataset, FashionMNISTDataset
 from .dataloader import MNISTDataloader, FashionMNISTDataloader
 from .client import SNNClient, CNNClient

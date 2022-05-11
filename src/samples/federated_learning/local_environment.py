@@ -17,6 +17,7 @@ class LocalEnvironment():
         self.test_dataset = data.test_dataset
         self.train_dataloader = data.train_dataloader
         self.test_dataloader = data.test_dataloader
+        self.ClientType = self.configs.CLIENT_TYPE
         self.clients = self.create_clients()
     
     def divide_data_equally(self):
@@ -49,6 +50,6 @@ class LocalEnvironment():
         distributed_datasets = self.divide_data_equally()
         distributed_dataloaders = self.create_distributed_dataloaders(distributed_datasets)
         print("Create Clients")
-        return [Client(self.configs, dataloader, self.test_dataloader) for dataloader in distributed_dataloaders]
+        return [self.ClientType(self.configs, dataloader, self.test_dataloader) for dataloader in distributed_dataloaders]
         print(self.clients[0])
 
