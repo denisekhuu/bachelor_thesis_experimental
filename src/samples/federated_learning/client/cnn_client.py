@@ -9,8 +9,9 @@ class CNNClient(Client):
     
     def __init__(self, configs, train_dataloader, test_dataloader):
         super(CNNClient, self).__init__(configs, train_dataloader, test_dataloader)
-        self.criterion = nn.CrossEntropyLoss()
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
+        self.criterion = nn.CrossEntropyLoss()
+
         
     def train(self, epoch):
         """
@@ -21,6 +22,7 @@ class CNNClient(Client):
         """
         self.net.train()
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
+            data, target = data.to(self.configs.DEVICE), target.to(self.configs.DEVICE)
             self.optimizer.zero_grad()
             output = self.net(data)
             loss = self.criterion(output, target)
@@ -43,6 +45,7 @@ class CNNClient(Client):
         total = 0
         with torch.no_grad():
             for data, target in self.test_dataloader:
+                data, target = data.to(self.configs.DEVICE), target.to(self.configs.DEVICE)
                 output = self.net(data)
                 loss = self.criterion(output, target)
                 test_loss += loss.item()

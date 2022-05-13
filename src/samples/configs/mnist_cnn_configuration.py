@@ -4,12 +4,12 @@ from torch import device
 from .nets import MNISTCNN, FashionMNISTCNN, MNISTSNN
 from .dataset import MNISTDataset, FashionMNISTDataset
 from .dataloader import MNISTDataloader, FashionMNISTDataloader
-from .client.snn_client import SNNClient
+from .client import SNNClient, CNNClient, Client
 
 class Configuration():
     
     # Dataset Config
-    BATCH_SIZE_TRAIN = 132
+    BATCH_SIZE_TRAIN = 64
     BATCH_SIZE_TEST = 1000
     DATASET = MNISTDataset
     
@@ -29,18 +29,15 @@ class Configuration():
     CIFAR10_LABELS = ['Plane', 'Car', 'Bird', 'Cat','Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     
     #Model Training Configurations
-    N_EPOCHS = 4
+    N_EPOCHS = 3
     LEARNING_RATE = 0.01
     MOMENTUM = 0.5
     LOG_INTERVAL = 10
-    CRITERION = nn.CrossEntropyLoss
-    NETWORK = MNISTSNN
+    CRITERION = nn.CrossEntropyLoss()
+    NETWORK = MNISTCNN
     
     #Local Environment Configurations
     NUMBER_OF_CLIENTS = 1
-    CLIENT_TYPE = SNNClient
+    CLIENT_TYPE = CNNClient
     DEVICE = device('cpu')
     
-    #Label Flipping Attack
-    FROM_LABEL = 5
-    TO_LABEL = 4

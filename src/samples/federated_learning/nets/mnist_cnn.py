@@ -18,3 +18,4 @@ class MNISTCNN(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
+        return x

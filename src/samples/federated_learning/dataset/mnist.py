@@ -37,3 +37,4 @@ class MNISTDataset(Dataset):
         
         print("MNIST test data loaded.")
         return test_loader, test_dataset
+    
