@@ -52,6 +52,10 @@ class CNNClient(Client):
                 pred = output.data.max(1, keepdim=True)[1]
                 correct += pred.eq(target.data.view_as(pred)).sum()
                 total += 1
+                for t, p in zip(target.view(-1), pred.view(-1)):
+                    self.confusion_matrix[t.long(), p.long()] += 1
         test_loss /= total
         self.test_losses.append(test_loss)
+        self.target_accuracy = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
+        self.test_accuracy = 100. * correct / len(self.test_dataloader.dataset)
         print('\nTest set: Avg. loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(test_loss, correct, len(self.test_dataloader.dataset), 100. * correct / len(self.test_dataloader.dataset)))

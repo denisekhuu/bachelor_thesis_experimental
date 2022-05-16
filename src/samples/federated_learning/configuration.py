@@ -35,6 +35,7 @@ class Configuration():
     LOG_INTERVAL = 10
     CRITERION = nn.CrossEntropyLoss
     NETWORK = MNISTSNN
+    NUMBER_TARGETS = 10
     
     #Local Environment Configurations
     NUMBER_OF_CLIENTS = 1

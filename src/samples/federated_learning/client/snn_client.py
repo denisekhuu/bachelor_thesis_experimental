@@ -38,8 +38,12 @@ class SNNClient(Client):
                 test_loss += self.criterion(output.log(), target).item() # sum up batch loss
                 pred = output.max(1, keepdim=True)[1] # get the index of the max log-probability
                 correct += pred.eq(target.view_as(pred)).sum().item()
+                for t, p in zip(target.view(-1), pred.view(-1)):
+                    self.confusion_matrix[t.long(), p.long()] += 1
         test_loss /= len(self.test_dataloader.dataset)
         print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
             test_loss, correct, len(self.test_dataloader.dataset),
             100. * correct / len(self.test_dataloader.dataset)))
         self.test_losses.append(test_loss)
+        self.target_accuracy = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
+        self.test_accuracy = 100. * correct / len(self.test_dataloader.dataset)

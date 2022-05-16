@@ -41,3 +41,7 @@ class Configuration():
     CLIENT_TYPE = CNNClient
     DEVICE = device('cpu')
     
+    
+    #Label Flipping Attack
+    FROM_LABEL = 5
+    TO_LABEL = 4

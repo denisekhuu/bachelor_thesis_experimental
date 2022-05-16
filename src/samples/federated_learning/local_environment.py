@@ -45,7 +45,7 @@ class LocalEnvironment():
     def poison_clients(self):
         for client in self.clients: 
             print("{} clients poisoned".format(len(self.clients)))
-            client.label_flipping_data(from_label = self.configs.FROM_LABEL, to_label = self.configs.TO_LABEL)
+            client.label_flipping_data(from_label = self.configs.FROM_LABEL, to_label = self.configs.TO_LABEL, 0.05)
 
     def create_clients(self):
         """

@@ -3,7 +3,7 @@ import numpy as np
 import torch
 
 class SHAPUtil():
-    def __init__(self, data_loader, clients):
+    def __init__(self, data_loader, net):
         """
         Simulation of isolated distributed clients
         :param data_loader: data to extract shap images and shap labels
@@ -12,12 +12,12 @@ class SHAPUtil():
         :type clients: Client[]
         """
         self.data_loader = data_loader
-        self.clients = clients
+        self.net = net
         self.images, self.targets = self.get_SHAP_dataset()
         self.shap_images, self.shap_indices = self.get_SHAP_sample()
         self.background = self.images[:100]
         self.e, self.shap_values = self.get_shap_values()
-        self.prediction = self.predict_shap_images()
+        self.prediction = self.predict()
         
     def get_SHAP_dataset(self):
         """
@@ -42,12 +42,12 @@ class SHAPUtil():
                 print("does not exist")
         return self.images[indices], indices
                     
-    def get_shap_values(self, net):
+    def get_shap_values(self):
         """
         Calculate DeepExplainer and SHAP values based on sample
         return shap.DeepExplainer, array
         """
-        e = shap.DeepExplainer(net, self.background)
+        e = shap.DeepExplainer(self.net, self.background)
         shap_values = e.shap_values(self.shap_images)
         return e, shap_values
 
@@ -67,11 +67,12 @@ class SHAPUtil():
             plt.yticks([])
         plt.show()
         
+    def predict(self):
         """
         Predict SHAP test images
         return Tensor
         """
-        output = net(self.images[self.shap_indices])
+        output = self.net(self.images[self.shap_indices])
         pred = output.data.max(1, keepdim=True)[1]
         print(pred)
         return pred
@@ -83,7 +84,8 @@ class SHAPUtil():
         import matplotlib.pyplot as plt
         shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in self.shap_values]
         test_numpy = np.swapaxes(np.swapaxes(self.shap_images.numpy(), 1, -1), 1, 2)
-        shap.image_plot(shap_numpy, -test_numpy)
+        shap.image_plot(shap_numpy, -test_numpy, show=False)
+        plt.savefig('results/shap_cnn.png')
         
         
     def analize(self):
