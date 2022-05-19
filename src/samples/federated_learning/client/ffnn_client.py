@@ -4,10 +4,10 @@ import torch.nn as nn
 from torch.nn import functional as F
 from .client import Client
 
-class SNNClient(Client): 
+class FFNNClient(Client): 
     
     def __init__(self, configs, train_dataloader, test_dataloader):
-        super(SNNClient, self).__init__(configs, train_dataloader, test_dataloader)
+        super(FFNNClient, self).__init__(configs, train_dataloader, test_dataloader)
         self.criterion = F.nll_loss
         self.optimizer = optim.SGD(self.net.parameters(), lr=0.01, momentum=0.5)
         

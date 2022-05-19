@@ -1,10 +1,10 @@
 import os
 import torch.nn as nn
 from torch import device
-from .nets import MNISTCNN, FashionMNISTCNN, MNISTSNN
+from .nets import MNISTCNN, FashionMNISTCNN, MNISTFFNN
 from .dataset import MNISTDataset, FashionMNISTDataset
 from .dataloader import MNISTDataloader, FashionMNISTDataloader
-from .client.snn_client import SNNClient
+from .client.ffnn_client import FFNNClient
 
 class Configuration():
     
@@ -34,12 +34,12 @@ class Configuration():
     MOMENTUM = 0.5
     LOG_INTERVAL = 10
     CRITERION = nn.CrossEntropyLoss
-    NETWORK = MNISTSNN
+    NETWORK = MNISTFFNN
     NUMBER_TARGETS = 10
     
     #Local Environment Configurations
     NUMBER_OF_CLIENTS = 1
-    CLIENT_TYPE = SNNClient
+    CLIENT_TYPE = FFNNClient
     DEVICE = device('cpu')
     
     #Label Flipping Attack

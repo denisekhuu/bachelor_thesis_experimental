@@ -43,9 +43,10 @@ class LocalEnvironment():
         return dataloaders
     
     def poison_clients(self):
-        for client in self.clients: 
-            print("{} clients poisoned".format(len(self.clients)))
-            client.label_flipping_data(from_label = self.configs.FROM_LABEL, to_label = self.configs.TO_LABEL, 0.05)
+        for index, client in enumerate(self.clients): 
+            print("{}/{} client poisoned".format(index+1, len(self.clients)))
+            client.label_flipping_data(from_label = self.configs.FROM_LABEL, to_label = self.configs.TO_LABEL, percentage = self.configs.DATA_POISONING_PERCENTAGE)
+            
 
     def create_clients(self):
         """

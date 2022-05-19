@@ -1,9 +1,9 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-class MNISTSNN(nn.Module):
+class MNISTFFNN(nn.Module):
     def __init__(self):
-        super(MNISTSNN, self).__init__()
+        super(MNISTFFNN, self).__init__()
 
         self.conv_layers = nn.Sequential(
             nn.Conv2d(1, 10, kernel_size=5),

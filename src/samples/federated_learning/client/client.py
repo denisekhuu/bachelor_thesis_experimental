@@ -38,6 +38,9 @@ class Client():
         if percentage == 1:
             self.train_dataloader.dataset.dataset.targets = torch.where(self.train_dataloader.dataset.dataset.targets == from_label, to_label, self.train_dataloader.dataset.dataset.targets)
         else:
-            print((self.train_dataloader.dataset.dataset.targets == from_label).nonzero(as_tuple=False))
+            last_index = int(len((self.train_dataloader.dataset.dataset.targets == from_label).nonzero(as_tuple=False)) * percentage)
+            indices = (self.train_dataloader.dataset.dataset.targets == from_label).nonzero(as_tuple=False)
+            self.train_dataloader.dataset.dataset.targets[indices[:last_index]] = to_label
+            print(self.train_dataloader.dataset.dataset.targets[indices])
             
         print("Label Flipping {}% from {} to {}".format(100. * percentage, from_label, to_label))

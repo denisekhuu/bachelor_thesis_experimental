@@ -1,3 +1,3 @@
 from .client import Client
-from .snn_client import SNNClient
+from .ffnn_client import FFNNClient
 from .cnn_client import CNNClient
