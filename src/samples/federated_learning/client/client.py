@@ -37,7 +37,6 @@ class Client():
         last_index = int(len(indices) * percentage)
         self.poisoned_indices = indices if percentage == 1 else indices[:last_index]
         self.train_dataloader.dataset.dataset.targets[self.poisoned_indices] = to_label
-        print(self.train_dataloader.dataset.dataset.targets[indices])
             
         print("Label Flipping {}% from {} to {}".format(100. * percentage, from_label, to_label))
         
@@ -50,7 +49,7 @@ class Client():
         
     def reset_net(self): 
         """
-        Set model to default setting without training
+        Set model to previous default parameters
         """
         self.net.apply(self.weight_reset)
         

@@ -45,7 +45,7 @@ class LocalEnvironment():
     def poison_clients(self):
         """
         Poison Clients with selected poisoning attack 
-        :TODO add different poisoning attack
+        :TODO add different poisoning attacks
         :TODO poison subset of clients only
         """
         for index, client in enumerate(self.clients): 
@@ -69,3 +69,4 @@ class LocalEnvironment():
         """
         for index, client in enumerate(self.clients):
             client.reset_net()
+            print("Reset network successfully")
