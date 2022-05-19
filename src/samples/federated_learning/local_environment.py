@@ -43,8 +43,13 @@ class LocalEnvironment():
         return dataloaders
     
     def poison_clients(self):
+        """
+        Poison Clients with selected poisoning attack 
+        :TODO add different poisoning attack
+        :TODO poison subset of clients only
+        """
         for index, client in enumerate(self.clients): 
-            print("{}/{} client poisoned".format(index+1, len(self.clients)))
+            print("{}/{} clients poisoned".format(index+1, len(self.clients)))
             client.label_flipping_data(from_label = self.configs.FROM_LABEL, to_label = self.configs.TO_LABEL, percentage = self.configs.DATA_POISONING_PERCENTAGE)
             
 
@@ -55,6 +60,12 @@ class LocalEnvironment():
         """
         distributed_datasets = self.divide_data_equally()
         distributed_dataloaders = self.create_distributed_dataloaders(distributed_datasets)
-        print("Create Clients")
+        print("Create {} clients".format(self.configs.NUMBER_OF_CLIENTS))
         return [self.ClientType(self.configs, dataloader, self.test_dataloader) for dataloader in distributed_dataloaders]
-
+    
+    def reset_client_nets(self):
+        """
+        Reset client's net to default
+        """
+        for index, client in enumerate(self.clients):
+            client.reset_net()

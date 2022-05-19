@@ -17,7 +17,6 @@ class Client():
         self.train_dataloader = train_dataloader
         self.test_dataloader = test_dataloader
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
-        self.poisoned = True
         self.train_losses = []
         self.train_counter = []
         self.test_losses = []
@@ -34,13 +33,27 @@ class Client():
         :param to_label: label flipped to
         :typeto_label: 
         """
-        
-        if percentage == 1:
-            self.train_dataloader.dataset.dataset.targets = torch.where(self.train_dataloader.dataset.dataset.targets == from_label, to_label, self.train_dataloader.dataset.dataset.targets)
-        else:
-            last_index = int(len((self.train_dataloader.dataset.dataset.targets == from_label).nonzero(as_tuple=False)) * percentage)
-            indices = (self.train_dataloader.dataset.dataset.targets == from_label).nonzero(as_tuple=False)
-            self.train_dataloader.dataset.dataset.targets[indices[:last_index]] = to_label
-            print(self.train_dataloader.dataset.dataset.targets[indices])
+        indices = (self.train_dataloader.dataset.dataset.targets == from_label).nonzero(as_tuple=False)
+        last_index = int(len(indices) * percentage)
+        self.poisoned_indices = indices if percentage == 1 else indices[:last_index]
+        self.train_dataloader.dataset.dataset.targets[self.poisoned_indices] = to_label
+        print(self.train_dataloader.dataset.dataset.targets[indices])
             
         print("Label Flipping {}% from {} to {}".format(100. * percentage, from_label, to_label))
+        
+    def set_net(self):
+        """
+        Set to untrained model net 
+        """
+        self.net = self.configs.NETWORK()
+        self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
+        
+    def reset_net(self): 
+        """
+        Set model to default setting without training
+        """
+        self.net.apply(self.weight_reset)
+        
+    def weight_reset(self, m):
+        if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+            m.reset_parameters()
