@@ -2,7 +2,7 @@ from .configuration import Configuration
 from .dataset import Dataset
 import torch
 
-class LocalEnvironment():
+class ClientPlane():
     
     def __init__(self, configs:  Configuration, data: Dataset):
         """
