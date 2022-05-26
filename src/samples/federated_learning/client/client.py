@@ -1,6 +1,7 @@
 import torch
 import torch.optim as optim
 import torch.nn as nn
+import numpy as np
 
 class Client(): 
     def __init__(self, configs, train_dataloader, test_dataloader, shap_util):
@@ -38,11 +39,14 @@ class Client():
         self.precision = []
         
         # SHAP utils
-        self.e = []
+        self.e = None
         self.shap_values = []
         self.shap_prediction = []
         
         # SHAP metrics
+        self.positive_shap = [[] for i in range(self.configs.NUMBER_TARGETS)]
+        self.negative_shap = [[] for i in range(self.configs.NUMBER_TARGETS)]
+        self.non_zero_mean = [[] for i in range(self.configs.NUMBER_TARGETS)]
         
         # label flipping meta data
         self.poisoned_indices = []
@@ -83,13 +87,18 @@ class Client():
         """
         if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
             m.reset_parameters()
-            
+        
     def get_shap_values(self):
         """
         Calculate SHAP values and SHAP image predictions 
         """
-        self.e, self.shap_values = self.shap_util.get_shap_values(self.net)
+        if not self.e: 
+            self.e = self.shap_util.deep_explainer(self.net)
+        self.shap_values = self.shap_util.get_shap_values()
         self.shap_prediction = self.shap_util.predict(self.net)
+        
+    def set_explainer(self): 
+        self.e = self.shap_util.deep_explainer(self.net)
           
     def plot_shap_values(self, file):
         """
@@ -101,6 +110,13 @@ class Client():
         self.recall = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
         self.precision = self.confusion_matrix.diag()/self.confusion_matrix.sum(0)
         self.accuracy = self.correct / len(self.test_dataloader.dataset)
+        
+    def analize_shap_values(self): 
+        for i in range(self.configs.NUMBER_TARGETS):
+            self.positive_shap[i] = [np.sum(np.array(arr) > 0) for arr in self.shap_values[i]]
+            self.negative_shap[i] = [np.sum(np.array(arr) < 0) for arr in self.shap_values[i]]
+            self.non_zero_mean[i] = [arr[np.nonzero(arr)].mean() for arr in self.shap_values[i]]
+        
         
         
         

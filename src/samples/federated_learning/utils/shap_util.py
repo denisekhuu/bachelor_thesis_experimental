@@ -55,18 +55,27 @@ class SHAPUtil():
             plt.yticks([])
         plt.show()
         
-    def get_shap_values(self, net):
+    def set_deep_explainer(self, net):
         """
-        Calculate DeepExplainer and SHAP values based on sample
-        return shap.DeepExplainer, array
+        Calculate DeepExplainer 
+        return shap.DeepExplainer
         """
-        e = shap.DeepExplainer(net, self.background)
-        shap_values = e.shap_values(self.shap_images)
-        return e, shap_values
+        return shap.DeepExplainer(net, self.background)
+    
+    def get_shap_values(self, e):
+        """
+        Calculate SHAP values based on sample
+        :param e: Explainer model
+        :type e: shap.DeepExplainer
+        return array
+        """
+        return e.shap_values(self.shap_images)
 
     def predict(self, net):
         """
         Predict SHAP test images
+        :param net: network of model 
+        :type net: nn.model
         return Tensor
         """
         output = net(self.images[self.shap_indices])
