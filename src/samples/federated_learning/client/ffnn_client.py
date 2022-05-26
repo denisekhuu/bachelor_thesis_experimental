@@ -6,8 +6,8 @@ from .client import Client
 
 class FFNNClient(Client): 
     
-    def __init__(self, configs, train_dataloader, test_dataloader):
-        super(FFNNClient, self).__init__(configs, train_dataloader, test_dataloader)
+    def __init__(self, configs, train_dataloader, test_dataloader, shap_util):
+        super(FFNNClient, self).__init__(configs, train_dataloader, test_dataloader, shap_util)
         self.criterion = F.nll_loss
         self.optimizer = optim.SGD(self.net.parameters(), lr=0.01, momentum=0.5)
         
@@ -41,9 +41,9 @@ class FFNNClient(Client):
                 for t, p in zip(target.view(-1), pred.view(-1)):
                     self.confusion_matrix[t.long(), p.long()] += 1
         test_loss /= len(self.test_dataloader.dataset)
+        self.correct = correct
         print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
             test_loss, correct, len(self.test_dataloader.dataset),
             100. * correct / len(self.test_dataloader.dataset)))
         self.test_losses.append(test_loss)
-        self.target_accuracy = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
-        self.test_accuracy = 100. * correct / len(self.test_dataloader.dataset)
+        

@@ -4,7 +4,7 @@ import torch
 import os
 
 class SHAPUtil():
-    def __init__(self, data_loader, net):
+    def __init__(self, data_loader):
         """
         Simulation of isolated distributed clients
         :param data_loader: data to extract shap images and shap labels
@@ -13,12 +13,9 @@ class SHAPUtil():
         :type clients: Client[]
         """
         self.data_loader = data_loader
-        self.net = net
         self.images, self.targets = self.get_SHAP_dataset()
         self.shap_images, self.shap_indices = self.get_SHAP_sample()
         self.background = self.images[:100]
-        self.e, self.shap_values = self.get_shap_values()
-        self.prediction = self.predict()
         
     def get_SHAP_dataset(self):
         """
@@ -42,17 +39,7 @@ class SHAPUtil():
             except: 
                 print("does not exist")
         return self.images[indices], indices
-                    
-    def get_shap_values(self):
-        """
-        Calculate DeepExplainer and SHAP values based on sample
-        return shap.DeepExplainer, array
-        """
-        e = shap.DeepExplainer(self.net, self.background)
-        shap_values = e.shap_values(self.shap_images)
-        return e, shap_values
-
-    
+                
     def plot_shap_images(self):
         """
         Plot sample images and their target labels
@@ -68,31 +55,38 @@ class SHAPUtil():
             plt.yticks([])
         plt.show()
         
-    def predict(self):
+    def get_shap_values(self, net):
+        """
+        Calculate DeepExplainer and SHAP values based on sample
+        return shap.DeepExplainer, array
+        """
+        e = shap.DeepExplainer(net, self.background)
+        shap_values = e.shap_values(self.shap_images)
+        return e, shap_values
+
+    def predict(self, net):
         """
         Predict SHAP test images
         return Tensor
         """
-        output = self.net(self.images[self.shap_indices])
+        output = net(self.images[self.shap_indices])
         pred = output.data.max(1, keepdim=True)[1]
-        print("Predictions": pred)
+        print("Predictions:", pred)
         return pred
     
-    def plot(self, file):
+    def plot(self, shap_values, file):
         """
         Plot SHAP values and image
+        :param shap_values: name of file
+        :type shap_values: Tensor
         :param file: name of file
-        :type clients: os.path
+        :type file: os.path
         """
         import matplotlib.pyplot as plt
-        shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in self.shap_values]
+        shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in shap_values]
         test_numpy = np.swapaxes(np.swapaxes(self.shap_images.numpy(), 1, -1), 1, 2)
         shap.image_plot(shap_numpy, -test_numpy, show=False)
         if not os.path.exists(os.path.dirname(file)):
             os.makedirs(os.path.dirname(file))
         plt.savefig(file)
         
-        
-    def analize(self):
-        pass
-    

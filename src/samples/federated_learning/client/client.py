@@ -3,7 +3,7 @@ import torch.optim as optim
 import torch.nn as nn
 
 class Client(): 
-    def __init__(self, configs, train_dataloader, test_dataloader):
+    def __init__(self, configs, train_dataloader, test_dataloader, shap_util):
         """
         :param configs: experiment configurations
         :type configs: Configuration
@@ -11,19 +11,42 @@ class Client():
         :type train_dataloader: torch.utils.data.DataLoader
         :param test_dataloader: Test data loader
         :type test_dataloader: torch.utils.data.DataLoader
+        :param shap_util: utils for shap calculations
+        :type configs: SHAPUtil
         """
         self.configs = configs
+        self.shap_util = shap_util
         self.net = self.configs.NETWORK()
+        
+        # datasets
         self.train_dataloader = train_dataloader
         self.test_dataloader = test_dataloader
-        self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
+        
+        # loss metrics
         self.train_losses = []
         self.train_counter = []
         self.test_losses = []
-        self.test_accuracy = 0
         self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.configs.N_EPOCHS)]
+        
+        # raw performance measures
         self.confusion_matrix = torch.zeros(self.configs.NUMBER_TARGETS, self.configs.NUMBER_TARGETS)
-        self.target_accuracy = []
+        self.correct = 0
+        
+        # derived metrics
+        self.accuracy = 0
+        self.recall = []
+        self.precision = []
+        
+        # SHAP utils
+        self.e = []
+        self.shap_values = []
+        self.shap_prediction = []
+        
+        # SHAP metrics
+        
+        # label flipping meta data
+        self.poisoned_indices = []
+        self.poisoning_indices = []
         
     def label_flipping_data(self, from_label, to_label, percentage = 1): 
         """
@@ -35,6 +58,7 @@ class Client():
         """
         indices = (self.train_dataloader.dataset.dataset.targets == from_label).nonzero(as_tuple=False)
         last_index = int(len(indices) * percentage)
+        self.poisoning_indices = indices
         self.poisoned_indices = indices if percentage == 1 else indices[:last_index]
         self.train_dataloader.dataset.dataset.targets[self.poisoned_indices] = to_label
             
@@ -54,5 +78,29 @@ class Client():
         self.net.apply(self.weight_reset)
         
     def weight_reset(self, m):
+        """
+        Reset weights of model
+        """
         if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
             m.reset_parameters()
+            
+    def get_shap_values(self):
+        """
+        Calculate SHAP values and SHAP image predictions 
+        """
+        self.e, self.shap_values = self.shap_util.get_shap_values(self.net)
+        self.shap_prediction = self.shap_util.predict(self.net)
+          
+    def plot_shap_values(self, file):
+        """
+        Plot SHAP images
+        """
+        self.shap_util.plot(self.shap_values, file)
+        
+    def analize(self):
+        self.recall = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
+        self.precision = self.confusion_matrix.diag()/self.confusion_matrix.sum(0)
+        self.accuracy = self.correct / len(self.test_dataloader.dataset)
+        
+        
+        

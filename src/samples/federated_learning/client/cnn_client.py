@@ -7,8 +7,8 @@ from .client import Client
 
 class CNNClient(Client): 
     
-    def __init__(self, configs, train_dataloader, test_dataloader):
-        super(CNNClient, self).__init__(configs, train_dataloader, test_dataloader)
+    def __init__(self, configs, train_dataloader, test_dataloader, shap_util):
+        super(CNNClient, self).__init__(configs, train_dataloader, test_dataloader, shap_util)
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
         self.criterion = nn.CrossEntropyLoss()
 
@@ -54,8 +54,8 @@ class CNNClient(Client):
                 total += 1
                 for t, p in zip(target.view(-1), pred.view(-1)):
                     self.confusion_matrix[t.long(), p.long()] += 1
+                    
         test_loss /= total
+        self.correct = correct
         self.test_losses.append(test_loss)
-        self.target_accuracy = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
-        self.test_accuracy = 100. * correct / len(self.test_dataloader.dataset)
         print('\nTest set: Avg. loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(test_loss, correct, len(self.test_dataloader.dataset), 100. * correct / len(self.test_dataloader.dataset)))
