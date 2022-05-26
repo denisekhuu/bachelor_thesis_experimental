@@ -35,18 +35,5 @@ services:
     volumes:
       - vmdata:/victoria-metrics-data
 
-  grafana:
-    container_name: grafana
-    image: grafana/grafana:8.5.1
-    depends_on:
-      - victoria_metrics
-    links:
-      - victoria_metrics
-    ports:
-      - 3000:3000
-    volumes:
-      - grafanadata:/var/lib/grafana
-
 volumes:
    vmdata: {}
-   grafanadata: {}
