@@ -1,6 +1,7 @@
 import shap
 import numpy as np
 import torch
+import os
 
 class SHAPUtil():
     def __init__(self, data_loader, net):
@@ -74,18 +75,22 @@ class SHAPUtil():
         """
         output = self.net(self.images[self.shap_indices])
         pred = output.data.max(1, keepdim=True)[1]
-        print(pred)
+        print("Predictions": pred)
         return pred
     
-    def plot(self):
+    def plot(self, file):
         """
         Plot SHAP values and image
+        :param file: name of file
+        :type clients: os.path
         """
         import matplotlib.pyplot as plt
         shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in self.shap_values]
         test_numpy = np.swapaxes(np.swapaxes(self.shap_images.numpy(), 1, -1), 1, 2)
         shap.image_plot(shap_numpy, -test_numpy, show=False)
-        plt.savefig('results/shap_cnn.png')
+        if not os.path.exists(os.path.dirname(file)):
+            os.makedirs(os.path.dirname(file))
+        plt.savefig(file)
         
         
     def analize(self):
