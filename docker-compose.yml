@@ -10,4 +10,43 @@ services:
       - ./src:/home/jovyan/work
     ports:
       - 8888:8888
+    environment:
+      - VM_URL=victoria_metrics:8428
+    depends_on:
+      - victoria_metrics
+    links:
+      - victoria_metrics
     container_name: bachelor_notebooks
+
+  victoria_metrics:
+    container_name: victoria_metrics
+    image: victoriametrics/victoria-metrics:latest
+    command: -storageDataPath=/victoria-metrics-data -memory.allowedPercent=20
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - 8428:8428
+      - 8089:8089
+      - 8089:8089/udp
+      - 2003:2003
+      - 2003:2003/udp
+      - 4242:4242
+    volumes:
+      - vmdata:/victoria-metrics-data
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:8.5.1
+    depends_on:
+      - victoria_metrics
+    links:
+      - victoria_metrics
+    ports:
+      - 3000:3000
+    volumes:
+      - grafanadata:/var/lib/grafana
+
+volumes:
+   vmdata: {}
+   grafanadata: {}
