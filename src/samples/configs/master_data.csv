@@ -1,23 +1,24 @@
 	meta-data	data type	unit
 Observer	experiment_type	string	
 	experiment_id	int	
-			
-Client	client_id	int	
-	posioned	boolean	
 	poisoned_client	int	(in number)
-	poisoned_data	float	
+			
+Client	name	string	
+	client_id	int	
+	posioned	boolean	
+	poisoned_data	float	(in percent)
 	dataset_size	int	
 	type	string	
 			
-Server	server_id	int	
+Server	name	string	
+	server_id	int	
 	type	string	
 			
+Client Experiment 1	metrics	label	
+accuracy after Round R			
+recall_{i} in Round R		target	
+precision_{i} in Round R		target	
 			
-Client Experiment 1	metrics		
-accuracy in Round R			
-recall_{i} in Round R			
-precision_{i} in Round R			
-			
-shap_pos_{u}_{v}			
-shap_neg_{u}_{v}			
-shap_mean_{u}_{v}			
+shap_pos_{u}_{v}		target (u), source(v)	
+shap_neg_{u}_{v}		target (u), source(v)	
+shap_non_zero_mean_{u}_{v}		target (u), source(v)	

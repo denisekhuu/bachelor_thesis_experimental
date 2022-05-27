@@ -23,7 +23,7 @@ class FFNNClient(Client):
             if batch_idx % 100 == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(self.train_dataloader.dataset),
-                    100. * batch_idx / len(self.train_dataloader), loss.item()))
+                    100. * batch_idx / len(self.train_dataloader.dataset), loss.item()))
                 self.train_losses.append(loss.item())
                 self.train_counter.append((batch_idx*64) + ((epoch-1)*len(self.train_dataloader.dataset)))
 

@@ -43,9 +43,19 @@ class VMUtil():
         """
         Push data to Victoria Metrics Database
         """
-        timestamp = int(datetime.timestamp(datetime.now()))
         url = self.vm_url + "/write?precision=s"
         try:
-            request, response = self.http_request(url, data=data.format(timestamp))
+            request, response = self.http_request(url, data=data)
         except HTTPError as e: 
             print("ERROR: {}".format(e))
+            
+    def delete_old_metrics(self, name, metrics, labels=None):
+        target_url = self.vm_url + "/api/v1/admin/tsdb/delete_series?"
+        for metric in metrics:
+            print("Delete old metrics from {}_{} with {}".format(name, metric, labels))
+            data = "match[]={__name__='"+ name +"_" + metric + "'," + labels + "}" if labels else "match[]={__name__='"+ name + "_" + metric + "'}" 
+            try:
+                request = Request(target_url, data=data.encode('ascii', 'ignore'))
+                response = urlopen(request)
+            except HTTPError as e: 
+                print("ERROR: {}".format(e))

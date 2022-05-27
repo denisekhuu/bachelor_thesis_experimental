@@ -26,7 +26,7 @@ class Configuration():
     CIFAR10_LABELS = ['Plane', 'Car', 'Bird', 'Cat','Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     
     #Model Training Configurations
-    N_EPOCHS = 10
+    N_EPOCHS = 2
     LEARNING_RATE = 0.01
     MOMENTUM = 0.5
     LOG_INTERVAL = 10
@@ -35,11 +35,13 @@ class Configuration():
     NUMBER_TARGETS = 10
     
     #Local Environment Configurations
-    NUMBER_OF_CLIENTS = 200
+    NUMBER_OF_CLIENTS = 10
     CLIENT_TYPE = FFNNClient
     DEVICE = device('cpu')
     
     #Label Flipping Attack
+    POISONED = False
+    POISONED_CLIENTS = 0
     DATA_POISONING_PERCENTAGE = 1
     FROM_LABEL = 5
     TO_LABEL = 4

@@ -93,8 +93,8 @@ class Client():
         Calculate SHAP values and SHAP image predictions 
         """
         if not self.e: 
-            self.e = self.shap_util.deep_explainer(self.net)
-        self.shap_values = self.shap_util.get_shap_values()
+            self.e = self.shap_util.set_deep_explainer(self.net)
+        self.shap_values = self.shap_util.get_shap_values(self.e)
         self.shap_prediction = self.shap_util.predict(self.net)
         
     def set_explainer(self): 
