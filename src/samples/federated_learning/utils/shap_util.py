@@ -57,7 +57,7 @@ class SHAPUtil():
         
     def set_deep_explainer(self, net):
         """
-        Calculate DeepExplainer 
+        Calculate a DeepExplainer 
         return shap.DeepExplainer
         """
         return shap.DeepExplainer(net, self.background)

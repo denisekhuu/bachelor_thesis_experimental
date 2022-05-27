@@ -6,16 +6,13 @@ from .dataset import MNISTDataset, FashionMNISTDataset
 from .dataloader import MNISTDataloader, FashionMNISTDataloader
 from .client.ffnn_client import FFNNClient
 
+
 class Configuration():
     
     # Dataset Config
-    BATCH_SIZE_TRAIN = 132
+    BATCH_SIZE_TRAIN = 64
     BATCH_SIZE_TEST = 1000
     DATASET = MNISTDataset
-    
-    # DEPRICATED CONFIG
-    DATALOADER = MNISTDataloader
-    
     
     #MNIST_FASHION_DATASET Configurations
     MNIST_FASHION_DATASET_PATH = os.path.join('./data/mnist_fashion')
@@ -29,7 +26,7 @@ class Configuration():
     CIFAR10_LABELS = ['Plane', 'Car', 'Bird', 'Cat','Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     
     #Model Training Configurations
-    N_EPOCHS = 4
+    N_EPOCHS = 10
     LEARNING_RATE = 0.01
     MOMENTUM = 0.5
     LOG_INTERVAL = 10
@@ -38,10 +35,14 @@ class Configuration():
     NUMBER_TARGETS = 10
     
     #Local Environment Configurations
-    NUMBER_OF_CLIENTS = 1
+    NUMBER_OF_CLIENTS = 200
     CLIENT_TYPE = FFNNClient
     DEVICE = device('cpu')
     
     #Label Flipping Attack
+    DATA_POISONING_PERCENTAGE = 1
     FROM_LABEL = 5
     TO_LABEL = 4
+    
+    #Victoria Metrics Configurations
+    VM_URL = os.getenv('VM_URL') #URL settings in docker-compose.yml

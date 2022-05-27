@@ -63,7 +63,7 @@ class ClientPlane():
         """
         distributed_datasets = self.divide_data_equally()
         distributed_dataloaders = self.create_distributed_dataloaders(distributed_datasets)
-        print("Create {} clients".format(self.configs.NUMBER_OF_CLIENTS))
+        print("Create {} clients with dataset of size {}".format(self.configs.NUMBER_OF_CLIENTS, len(distributed_dataloaders[0].dataset)))
         return [self.ClientType(self.configs, dataloader, self.test_dataloader, self.shap_util) for dataloader in distributed_dataloaders]
     
     def reset_client_nets(self):
@@ -72,4 +72,4 @@ class ClientPlane():
         """
         for index, client in enumerate(self.clients):
             client.reset_net()
-            print("Reset network successfully")
+            print("Reset networks successfully")
