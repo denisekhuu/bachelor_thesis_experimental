@@ -1,5 +1,0 @@
-experiment_type	description		type
-	datasize_shap		client
-	poisoning_shap		
-	fl_shap		
-	defense		

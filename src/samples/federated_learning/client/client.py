@@ -5,26 +5,26 @@ import numpy as np
 from ..observer import ClientObserver
 
 class Client(): 
-    def __init__(self, configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
+    def __init__(self, config, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
         """
-        :param configs: experiment configurations
-        :type configs: Configuration
-        :param observer_configs: observer configurations
-        :type observer_configs: ObserverConfiguration
+        :param config: experiment configurations
+        :type config: Configuration
+        :param observer_config: observer configurations
+        :type observer_config: ObserverConfiguration
         :param client_id: client id
-        :type observerconfigs: int
+        :type observerconfig: int
         :param train_dataloader: Training data loader
         :type train_dataloader: torch.utils.data.DataLoader
         :param test_dataloader: Test data loader
         :type test_dataloader: torch.utils.data.DataLoader
         :param shap_util: utils for shap calculations
-        :type configs: SHAPUtil
+        :type shap_util: SHAPUtil
         """
-        self.configs = configs
+        self.config = config
         self.observer_config = observer_config
         self.shap_util = shap_util
-        self.net = self.configs.NETWORK()
-        self.observer = ClientObserver(self.configs, self.observer_config, client_id, False, len(train_dataloader.dataset))
+        self.net = self.config.NETWORK()
+        self.observer = ClientObserver(self.config, self.observer_config, client_id, False, len(train_dataloader.dataset))
         
         # datasets
         self.train_dataloader = train_dataloader
@@ -34,10 +34,10 @@ class Client():
         self.train_losses = []
         self.train_counter = []
         self.test_losses = []
-        self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.configs.N_EPOCHS)]
+        self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.config.N_EPOCHS)]
         
         # raw performance measures
-        self.confusion_matrix = torch.zeros(self.configs.NUMBER_TARGETS, self.configs.NUMBER_TARGETS)
+        self.confusion_matrix = torch.zeros(self.config.NUMBER_TARGETS, self.config.NUMBER_TARGETS)
         self.correct = 0
         
         # derived metrics
@@ -51,11 +51,12 @@ class Client():
         self.shap_prediction = []
         
         # SHAP metrics
-        self.positive_shap = [[] for i in range(self.configs.NUMBER_TARGETS)]
-        self.negative_shap = [[] for i in range(self.configs.NUMBER_TARGETS)]
-        self.non_zero_mean = [[] for i in range(self.configs.NUMBER_TARGETS)]
+        self.positive_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.negative_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.non_zero_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
         
         # label flipping meta data
+        self.is_poisoned = False
         self.poisoned_indices = []
         self.poisoning_indices = []
         
@@ -85,8 +86,8 @@ class Client():
         """
         Set to untrained model net 
         """
-        self.net = self.configs.NETWORK()
-        self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
+        self.net = self.config.NETWORK()
+        self.optimizer = optim.SGD(self.net.parameters(), lr=self.config.LEARNING_RATE, momentum=self.config.MOMENTUM)
         
     def reset_net(self): 
         """
@@ -128,7 +129,7 @@ class Client():
         
         
     def analize_shap_values(self): 
-        for i in range(self.configs.NUMBER_TARGETS):
+        for i in range(self.config.NUMBER_TARGETS):
             self.positive_shap[i] = [np.sum(np.array(arr) > 0) for arr in self.shap_values[i]]
             self.negative_shap[i] = [np.sum(np.array(arr) < 0) for arr in self.shap_values[i]]
             self.non_zero_mean[i] = [arr[np.nonzero(arr)].mean() for arr in self.shap_values[i]]
@@ -142,6 +143,15 @@ class Client():
         self.analize()
         self.observer.push_metrics(self.accuracy, self.recall, self.precision, self.positive_shap, self.negative_shap, self.non_zero_mean)
         
+    def update_config(self, config, observer_config):
+        self.config = config
+        self.observer_config = observer_config
+        self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.config.N_EPOCHS)]
+        self.confusion_matrix = torch.zeros(self.config.NUMBER_TARGETS, self.config.NUMBER_TARGETS)
+        self.positive_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.negative_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.non_zero_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.observer.update_config(config, observer_config)
         
         
         

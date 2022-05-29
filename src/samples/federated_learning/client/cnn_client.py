@@ -7,9 +7,9 @@ from .client import Client
 
 class CNNClient(Client): 
     
-    def __init__(self, configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
-        super(CNNClient, self).__init__(configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
-        self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
+    def __init__(self, config, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
+        super(CNNClient, self).__init__(config, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
+        self.optimizer = optim.SGD(self.net.parameters(), lr=self.config.LEARNING_RATE, momentum=self.config.MOMENTUM)
         self.criterion = nn.CrossEntropyLoss()
 
         
@@ -22,13 +22,13 @@ class CNNClient(Client):
         """
         self.net.train()
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
-            data, target = data.to(self.configs.DEVICE), target.to(self.configs.DEVICE)
+            data, target = data.to(self.config.DEVICE), target.to(self.config.DEVICE)
             self.optimizer.zero_grad()
             output = self.net(data)
             loss = self.criterion(output, target)
             loss.backward()
             self.optimizer.step()
-            if batch_idx % self.configs.LOG_INTERVAL == 0:
+            if batch_idx % self.config.LOG_INTERVAL == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(epoch, batch_idx * len(data), len(self.train_dataloader.dataset),100. * batch_idx / len(self.train_dataloader), loss.item()))
                 self.train_losses.append(loss.item())
                 self.train_counter.append((batch_idx*64) + ((epoch-1)*len(self.train_dataloader.dataset)))
@@ -45,7 +45,7 @@ class CNNClient(Client):
         total = 0
         with torch.no_grad():
             for data, target in self.test_dataloader:
-                data, target = data.to(self.configs.DEVICE), target.to(self.configs.DEVICE)
+                data, target = data.to(self.config.DEVICE), target.to(self.config.DEVICE)
                 output = self.net(data)
                 loss = self.criterion(output, target)
                 test_loss += loss.item()

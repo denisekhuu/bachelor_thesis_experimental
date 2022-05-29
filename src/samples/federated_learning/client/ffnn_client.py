@@ -6,15 +6,15 @@ from .client import Client
 
 class FFNNClient(Client): 
     
-    def __init__(self, configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
-        super(FFNNClient, self).__init__(configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
+    def __init__(self, config, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
+        super(FFNNClient, self).__init__(config, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
         self.criterion = F.nll_loss
         self.optimizer = optim.SGD(self.net.parameters(), lr=0.01, momentum=0.5)
         
     def train(self, epoch):
         self.net.train()
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
-            data, target = data.to(self.configs.DEVICE), target.to(self.configs.DEVICE)
+            data, target = data.to(self.config.DEVICE), target.to(self.config.DEVICE)
             self.optimizer.zero_grad()
             output = self.net(data)
             loss = self.criterion(output.log(), target)
@@ -33,7 +33,7 @@ class FFNNClient(Client):
         correct = 0
         with torch.no_grad():
             for data, target in self.test_dataloader:
-                data, target = data.to(self.configs.DEVICE), target.to(self.configs.DEVICE)
+                data, target = data.to(self.config.DEVICE), target.to(self.config.DEVICE)
                 output = self.net(data)
                 test_loss += self.criterion(output.log(), target).item() # sum up batch loss
                 pred = output.max(1, keepdim=True)[1] # get the index of the max log-probability

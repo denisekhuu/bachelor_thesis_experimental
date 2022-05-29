@@ -64,6 +64,15 @@ class ClientObserver(Observer):
         for d in data:
             self.push_data(d)
         print("Successfully pushed client data to victoria metrics")
+    
+    def update_config(self, config, observer_config):
+        self.name = self.observer_config.client_name 
+        self.poisoned_data = self.config.DATA_POISONING_PERCENTAGE
+        self.num_epoch = self.config.N_EPOCHS
+        self.batch_size = self.config.BATCH_SIZE_TRAIN
+        self.num_clients = self.config.NUMBER_OF_CLIENTS
+        self.type = self.observer_config.client_type
+        
         
         
         
