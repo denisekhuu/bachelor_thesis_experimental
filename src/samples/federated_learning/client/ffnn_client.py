@@ -6,8 +6,8 @@ from .client import Client
 
 class FFNNClient(Client): 
     
-    def __init__(self, configs, train_dataloader, test_dataloader, shap_util):
-        super(FFNNClient, self).__init__(configs, train_dataloader, test_dataloader, shap_util)
+    def __init__(self, configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
+        super(FFNNClient, self).__init__(configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
         self.criterion = F.nll_loss
         self.optimizer = optim.SGD(self.net.parameters(), lr=0.01, momentum=0.5)
         
@@ -23,7 +23,7 @@ class FFNNClient(Client):
             if batch_idx % 100 == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(self.train_dataloader.dataset),
-                    100. * batch_idx / len(self.train_dataloader.dataset), loss.item()))
+                    100. * batch_idx / len(self.train_dataloader), loss.item()))
                 self.train_losses.append(loss.item())
                 self.train_counter.append((batch_idx*64) + ((epoch-1)*len(self.train_dataloader.dataset)))
 

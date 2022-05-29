@@ -7,8 +7,8 @@ from .client import Client
 
 class CNNClient(Client): 
     
-    def __init__(self, configs, train_dataloader, test_dataloader, shap_util):
-        super(CNNClient, self).__init__(configs, train_dataloader, test_dataloader, shap_util)
+    def __init__(self, configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
+        super(CNNClient, self).__init__(configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.configs.LEARNING_RATE, momentum=self.configs.MOMENTUM)
         self.criterion = nn.CrossEntropyLoss()
 

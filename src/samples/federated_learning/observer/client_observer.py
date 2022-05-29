@@ -1,5 +1,6 @@
 from datetime import datetime
 from .observer import Observer
+import torch
 
 class ClientObserver(Observer):
     def __init__(self, config, observer_config, client_id, poisoned, dataset_size):
@@ -8,6 +9,9 @@ class ClientObserver(Observer):
         self.client_id = client_id
         self.poisoned = poisoned
         self.poisoned_data = self.config.DATA_POISONING_PERCENTAGE
+        self.num_epoch = self.config.N_EPOCHS
+        self.batch_size = self.config.BATCH_SIZE_TRAIN
+        self.num_clients = self.config.NUMBER_OF_CLIENTS
         self.dataset_size = dataset_size
         self.type = self.observer_config.client_type
         self.metric_labels = { 
@@ -20,8 +24,11 @@ class ClientObserver(Observer):
         }
         self.metrics = ["accuracy", "recall", "precision", "shap_pos", "shap_neg", "shap_mean"]
     
+    def set_poisoned(poisoned):
+        self.poisoned = poisoned
+    
     def get_labels(self): 
-        return "client_id={},test={},poisoned={},poisoned_data={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={}".format(
+        return "client_id={},test={},poisoned={},poisoned_data={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={},num_of_epochs={},batch_size={},num_clients={}".format(
             self.client_id,
             self.test,
             self.poisoned,
@@ -31,6 +38,9 @@ class ClientObserver(Observer):
             self.experiment_type,
             self.experiment_id,
             self.poisoned_clients,
+            self.num_epoch,
+            self.batch_size,
+            self.num_clients
         )
     
     def get_datastr(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean):

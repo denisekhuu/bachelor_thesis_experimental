@@ -26,7 +26,7 @@ class Configuration():
     CIFAR10_LABELS = ['Plane', 'Car', 'Bird', 'Cat','Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     
     #Model Training Configurations
-    N_EPOCHS = 2
+    N_EPOCHS = 5
     LEARNING_RATE = 0.01
     MOMENTUM = 0.5
     LOG_INTERVAL = 10

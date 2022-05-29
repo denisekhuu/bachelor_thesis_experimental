@@ -4,17 +4,20 @@ import torch
 
 class ClientPlane():
     
-    def __init__(self, configs, data, shap_util):
+    def __init__(self, configs, observer_config, data, shap_util):
         """
         Simulation of isolated distributed clients
         :param configs: experiment configurations
         :type configs: Configuration
+        :param observer_configs: observer configurations
+        :type observer_configs: ObserverConfiguration
         :param data: aggregated dataset 
         :type configs: dataset.Dataset
         :param shap_util: utils for shap calculations
         :type configs: SHAPUtil
         """
         self.configs = configs
+        self.observer_config = observer_config
         self.shap_util = shap_util
         self.train_dataset = data.train_dataset
         self.test_dataset = data.test_dataset
@@ -64,7 +67,7 @@ class ClientPlane():
         distributed_datasets = self.divide_data_equally()
         distributed_dataloaders = self.create_distributed_dataloaders(distributed_datasets)
         print("Create {} clients with dataset of size {}".format(self.configs.NUMBER_OF_CLIENTS, len(distributed_dataloaders[0].dataset)))
-        return [self.ClientType(self.configs, dataloader, self.test_dataloader, self.shap_util) for dataloader in distributed_dataloaders]
+        return [self.ClientType(self.configs, self.observer_config, idx, dataloader, self.test_dataloader, self.shap_util) for idx, dataloader in enumerate(distributed_dataloaders)]
     
     def reset_client_nets(self):
         """
