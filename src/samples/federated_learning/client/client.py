@@ -2,12 +2,17 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import numpy as np
+from ..observer import ClientObserver
 
 class Client(): 
-    def __init__(self, configs, train_dataloader, test_dataloader, shap_util):
+    def __init__(self, configs, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
         """
         :param configs: experiment configurations
         :type configs: Configuration
+        :param observer_configs: observer configurations
+        :type observer_configs: ObserverConfiguration
+        :param client_id: client id
+        :type observerconfigs: int
         :param train_dataloader: Training data loader
         :type train_dataloader: torch.utils.data.DataLoader
         :param test_dataloader: Test data loader
@@ -16,8 +21,10 @@ class Client():
         :type configs: SHAPUtil
         """
         self.configs = configs
+        self.observer_config = observer_config
         self.shap_util = shap_util
         self.net = self.configs.NETWORK()
+        self.observer = ClientObserver(self.configs, self.observer_config, client_id, False, len(train_dataloader.dataset))
         
         # datasets
         self.train_dataloader = train_dataloader
@@ -65,6 +72,7 @@ class Client():
         self.poisoning_indices = indices
         self.poisoned_indices = indices if percentage == 1 else indices[:last_index]
         self.train_dataloader.dataset.dataset.targets[self.poisoned_indices] = to_label
+        self.observer.set_poisoned(True)
             
         print("Label Flipping {}% from {} to {}".format(100. * percentage, from_label, to_label))
         
@@ -106,16 +114,28 @@ class Client():
         """
         self.shap_util.plot(self.shap_values, file)
         
-    def analize(self):
+    def analize_test(self):
         self.recall = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
         self.precision = self.confusion_matrix.diag()/self.confusion_matrix.sum(0)
         self.accuracy = self.correct / len(self.test_dataloader.dataset)
+        self.precision[torch.isnan(self.precision)] = 0
+        self.recall[torch.isnan(self.recall)] = 0
+        
         
     def analize_shap_values(self): 
         for i in range(self.configs.NUMBER_TARGETS):
             self.positive_shap[i] = [np.sum(np.array(arr) > 0) for arr in self.shap_values[i]]
             self.negative_shap[i] = [np.sum(np.array(arr) < 0) for arr in self.shap_values[i]]
             self.non_zero_mean[i] = [arr[np.nonzero(arr)].mean() for arr in self.shap_values[i]]
+            
+    def analize(self):
+        self.analize_test()
+        self.get_shap_values()
+        self.analize_shap_values()
+    
+    def push_metrics(self): 
+        self.analize()
+        self.observer.push_metrics(self.accuracy, self.recall, self.precision, self.positive_shap, self.negative_shap, self.non_zero_mean)
         
         
         
