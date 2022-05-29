@@ -54,9 +54,15 @@ class ClientPlane():
         :TODO add different poisoning attacks
         :TODO poison subset of clients only
         """
-        for index, client in enumerate(self.clients): 
-            print("{}/{} clients poisoned".format(index+1, len(self.clients)))
-            client.label_flipping_data(from_label = self.configs.FROM_LABEL, to_label = self.configs.TO_LABEL, percentage = self.configs.DATA_POISONING_PERCENTAGE)
+        if self.configs.DATA_POISONING_PERCENTAGE > 0:
+            print("Flipp {} of the {} labels to {}".format(self.configs.DATA_POISONING_PERCENTAGE, self.configs.FROM_LABEL, self.configs.TO_LABEL))
+            for index, client in enumerate(self.clients):
+                if (index+1)%20 == 0:
+                    print("{}/{} clients poisoned".format(index+1, len(self.clients)))
+                client.label_flipping_data(from_label = self.configs.FROM_LABEL, to_label = self.configs.TO_LABEL, percentage = self.configs.DATA_POISONING_PERCENTAGE)
+        else: 
+            print("No poisoning due to {}% poisoning rate", self.configs.DATA_POISONING_PERCENTAGE * 100.)
+            
             
 
     def create_clients(self):
@@ -75,4 +81,12 @@ class ClientPlane():
         """
         for index, client in enumerate(self.clients):
             client.reset_net()
-            print("Reset networks successfully")
+        print("Reset networks successfully")
+            
+    def reset_poisoning_attack(self):
+        for index, client in enumerate(self.clients):
+            if (index+1)%20 == 0:
+                print("{}/{} clients cleaned".format(index+1/ len(self.clients)))
+            client.reset_label_flipping_data(from_label=self.configs.FROM_LABEL, percentage=self.configs.DATA_POISONING_PERCENTAGE)
+        print("Cleaning successfully")
+            

@@ -59,7 +59,7 @@ class Client():
         self.poisoned_indices = []
         self.poisoning_indices = []
         
-    def label_flipping_data(self, from_label, to_label, percentage = 1): 
+    def label_flipping_data(self, from_label, to_label, percentage=1): 
         """
         Label Flipping attack on distributed client 
         :param from_label: label to be flipped
@@ -67,14 +67,19 @@ class Client():
         :param to_label: label flipped to
         :typeto_label: 
         """
-        indices = (self.train_dataloader.dataset.dataset.targets == from_label).nonzero(as_tuple=False)
+        indices = (self.train_dataloader.dataset.dataset.targets[self.train_dataloader.dataset.indices] == from_label).nonzero(as_tuple=False)
         last_index = int(len(indices) * percentage)
         self.poisoning_indices = indices
         self.poisoned_indices = indices if percentage == 1 else indices[:last_index]
         self.train_dataloader.dataset.dataset.targets[self.poisoned_indices] = to_label
         self.observer.set_poisoned(True)
-            
-        print("Label Flipping {}% from {} to {}".format(100. * percentage, from_label, to_label))
+        self.is_poisoned = True
+        
+    def reset_label_flipping_data(self,from_label, percentage=1):
+        if self.is_poisoned: 
+            self.train_dataloader.dataset.dataset.targets[self.poisoning_indices] = from_label
+            self.is_poisoned = False
+            self.observer.set_poisoned(False)
         
     def set_net(self):
         """

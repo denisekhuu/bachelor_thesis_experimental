@@ -9,3 +9,4 @@ class Observer(VMUtil):
         self.experiment_id = self.observer_config.experiment_id
         self.poisoned_clients = self.config.POISONED_CLIENTS
         self.test = self.observer_config.test
+        self.dataset_type = self.observer_config.dataset_type

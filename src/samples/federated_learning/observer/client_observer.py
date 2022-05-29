@@ -24,11 +24,11 @@ class ClientObserver(Observer):
         }
         self.metrics = ["accuracy", "recall", "precision", "shap_pos", "shap_neg", "shap_mean"]
     
-    def set_poisoned(poisoned):
+    def set_poisoned(self, poisoned):
         self.poisoned = poisoned
     
     def get_labels(self): 
-        return "client_id={},test={},poisoned={},poisoned_data={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={},num_of_epochs={},batch_size={},num_clients={}".format(
+        return "client_id={},test={},poisoned={},poisoned_data={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={},num_of_epochs={},batch_size={},num_clients={},dataset_type={}".format(
             self.client_id,
             self.test,
             self.poisoned,
@@ -40,7 +40,8 @@ class ClientObserver(Observer):
             self.poisoned_clients,
             self.num_epoch,
             self.batch_size,
-            self.num_clients
+            self.num_clients,
+            self.dataset_type
         )
     
     def get_datastr(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean):
