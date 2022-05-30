@@ -1,3 +1,3 @@
 from .client import Client
-from .ffnn_client import FFNNClient
-from .cnn_client import CNNClient
+from .fmnist_client import FMNISTClient
+from .mnist_client import MNISTClient

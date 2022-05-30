@@ -1,11 +1,10 @@
 import os
 import torch.nn as nn
 from torch import device
-from .nets import MNISTCNN, FashionMNISTCNN, MNISTFFNN
+from .nets import MNISTCNN, FashionMNISTCNN
 from .dataset import MNISTDataset, FashionMNISTDataset
 from .dataloader import MNISTDataloader, FashionMNISTDataloader
-from .client.ffnn_client import FFNNClient
-
+from .client import FMNISTClient, MNISTClient
 
 class Configuration():
     
@@ -26,16 +25,20 @@ class Configuration():
     CIFAR10_LABELS = ['Plane', 'Car', 'Bird', 'Cat','Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     
     #Model Training Configurations
-    N_EPOCHS = 10
+    ROUNDS = 200
+    N_EPOCHS = 1
     LEARNING_RATE = 0.01
     MOMENTUM = 0.5
     LOG_INTERVAL = 200
-    NETWORK = MNISTFFNN
+    
+    # Model Type Configurations
+    MODELNAME = "MNISTCNN"
+    NETWORK = MNISTCNN
+    CLIENT_TYPE = MNISTClient
     NUMBER_TARGETS = 10
     
     #Local Environment Configurations
-    NUMBER_OF_CLIENTS = 100
-    CLIENT_TYPE = FFNNClient
+    NUMBER_OF_CLIENTS = 200
     DEVICE = device('cpu')
     
     #Label Flipping Attack 

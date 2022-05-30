@@ -4,12 +4,12 @@ import torch.nn as nn
 from torch.nn import functional as F
 from .client import Client
 
-class FFNNClient(Client): 
+class MNISTClient(Client): 
     
     def __init__(self, config, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
-        super(FFNNClient, self).__init__(config, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
+        super(MNISTClient, self).__init__(config, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
         self.criterion = F.nll_loss
-        self.optimizer = optim.SGD(self.net.parameters(), lr=0.01, momentum=0.5)
+        self.optimizer = optim.SGD(self.net.parameters(), lr=self.config.LEARNING_RATE, momentum=self.config.MOMENTUM)
         
     def train(self, epoch):
         self.net.train()

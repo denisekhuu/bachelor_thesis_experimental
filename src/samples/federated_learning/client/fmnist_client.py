@@ -5,10 +5,10 @@ from torch.nn import functional as F
 
 from .client import Client
 
-class CNNClient(Client): 
+class FMNISTClient(Client): 
     
     def __init__(self, config, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
-        super(CNNClient, self).__init__(config, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
+        super(FMNISTClient, self).__init__(config, observer_config, client_id, train_dataloader, test_dataloader, shap_util)
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.config.LEARNING_RATE, momentum=self.config.MOMENTUM)
         self.criterion = nn.CrossEntropyLoss()
 
