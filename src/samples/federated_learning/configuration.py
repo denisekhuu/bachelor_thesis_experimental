@@ -10,7 +10,7 @@ from .client.ffnn_client import FFNNClient
 class Configuration():
     
     # Dataset Config
-    BATCH_SIZE_TRAIN = 64
+    BATCH_SIZE_TRAIN = 10
     BATCH_SIZE_TEST = 1000
     DATASET = MNISTDataset
     
@@ -26,10 +26,10 @@ class Configuration():
     CIFAR10_LABELS = ['Plane', 'Car', 'Bird', 'Cat','Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     
     #Model Training Configurations
-    N_EPOCHS = 5
+    N_EPOCHS = 10
     LEARNING_RATE = 0.01
     MOMENTUM = 0.5
-    LOG_INTERVAL = 10
+    LOG_INTERVAL = 100
     CRITERION = nn.CrossEntropyLoss
     NETWORK = MNISTFFNN
     NUMBER_TARGETS = 10

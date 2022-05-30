@@ -4,6 +4,19 @@ import torch
 
 class ClientObserver(Observer):
     def __init__(self, config, observer_config, client_id, poisoned, dataset_size):
+        """
+        Observer of Client to push model state to victoria metrics
+        :param config: experiment configurations
+        :type config: Configuration
+        :param observer_config: observer configurations
+        :type observer_config: ObserverConfiguration
+        :param client_id: client id
+        :type config: int
+        :param poisoned: poisoned toggle
+        :type poisoned: boolean 
+        :param dataset_size: size of dataset
+        :type poisoned: int
+        """
         super(ClientObserver, self).__init__(config, observer_config)
         self.name = self.observer_config.client_name 
         self.client_id = client_id
@@ -27,7 +40,10 @@ class ClientObserver(Observer):
     def set_poisoned(self, poisoned):
         self.poisoned = poisoned
     
-    def get_labels(self): 
+    def get_labels(self):
+        """
+        Creates Victoria Metrics meta data string
+        """
         return "client_id={},test={},poisoned={},poisoned_data={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={},num_of_epochs={},batch_size={},num_clients={},dataset_type={}".format(
             self.client_id,
             self.test,
@@ -45,6 +61,21 @@ class ClientObserver(Observer):
         )
     
     def get_datastr(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean):
+        """
+        Creates data string for victoria metrics
+        :param accuracy: test accuracy 
+        :type  accuracy: float
+        :param recall: test recall matrix
+        :type  recall: Tensor
+        :param precision: test precision matrix
+        :type  precision: Tensor
+        :param shap_pos: positive SHAP value matrix
+        :type  shap_pos: Tensor
+        :param shap_neg: negativ SHAP value matrix
+        :type  shap_neg: Tensor
+        :param shap_mean: mean of SHAP values
+        :type  shap_mean: Tensor
+        """
         timestamp = int(datetime.timestamp(datetime.now()))
         data = []
         labels = self.get_labels()
@@ -60,12 +91,35 @@ class ClientObserver(Observer):
         return data
     
     def push_metrics(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean):
+        """
+        Push SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
+        and test metrics like accuracy, precision and recall to victoria metrics
+        :param accuracy: test accuracy 
+        :type  accuracy: float
+        :param recall: test recall matrix
+        :type  recall: Tensor
+        :param precision: test precision matrix
+        :type  precision: Tensor
+        :param shap_pos: positive SHAP value matrix
+        :type  shap_pos: Tensor
+        :param shap_neg: negativ SHAP value matrix
+        :type  shap_neg: Tensor
+        :param shap_mean: mean of SHAP values
+        :type  shap_mean: Tensor
+        """
         data = self.get_datastr(accuracy, recall, precision, shap_pos, shap_neg, shap_mean)
         for d in data:
             self.push_data(d)
         print("Successfully pushed client data to victoria metrics")
     
     def update_config(self, config, observer_config):
+        """
+        Update client observer configurations 
+        :param config: experiment configurations
+        :type config: Configuration
+        :param observer_config: observer configurations
+        :type observer_config: ObserverConfiguration
+        """
         self.name = self.observer_config.client_name 
         self.poisoned_data = self.config.DATA_POISONING_PERCENTAGE
         self.num_epoch = self.config.N_EPOCHS

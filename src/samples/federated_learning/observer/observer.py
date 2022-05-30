@@ -1,6 +1,13 @@
 from ..utils import VMUtil
 
 class Observer(VMUtil):
+    """
+    Observer to push model states to victoria metrics
+    :param config: experiment configurations
+    :type config: Configuration
+    :param observer_config: observer configurations
+    :type observer_config: ObserverConfiguration
+    """
     def __init__(self, config, observer_config):
         super(Observer, self).__init__(config)
         self.config = config

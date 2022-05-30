@@ -121,6 +121,9 @@ class Client():
         self.shap_util.plot(self.shap_values, file)
         
     def analize_test(self):
+        """
+        Calculate test metrics like accuracy, precision and recall
+        """
         self.recall = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
         self.precision = self.confusion_matrix.diag()/self.confusion_matrix.sum(0)
         self.accuracy = self.correct / len(self.test_dataloader.dataset)
@@ -129,21 +132,39 @@ class Client():
         
         
     def analize_shap_values(self): 
+        """
+        Calculate SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
+        """
         for i in range(self.config.NUMBER_TARGETS):
             self.positive_shap[i] = [np.sum(np.array(arr) > 0) for arr in self.shap_values[i]]
             self.negative_shap[i] = [np.sum(np.array(arr) < 0) for arr in self.shap_values[i]]
             self.non_zero_mean[i] = [arr[np.nonzero(arr)].mean() for arr in self.shap_values[i]]
             
     def analize(self):
+        """
+        Calculate SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
+        and test metrics like accuracy, precision and recall
+        """
         self.analize_test()
         self.get_shap_values()
         self.analize_shap_values()
     
     def push_metrics(self): 
+        """
+        Push SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
+        and test metrics like accuracy, precision and recall to victoria metrics
+        """
         self.analize()
         self.observer.push_metrics(self.accuracy, self.recall, self.precision, self.positive_shap, self.negative_shap, self.non_zero_mean)
         
     def update_config(self, config, observer_config):
+        """
+        Update client configurations 
+        :param config: experiment configurations
+        :type config: Configuration
+        :param observer_config: observer configurations
+        :type observer_config: ObserverConfiguration
+        """
         self.config = config
         self.observer_config = observer_config
         self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.config.N_EPOCHS)]

@@ -50,7 +50,7 @@ class ClientPlane():
     
     def poison_clients(self):
         """
-        Poison Clients with selected poisoning attack 
+        Poison clients with selected poisoning attack 
         :TODO add different poisoning attacks
         :TODO poison subset of clients only
         """
@@ -91,6 +91,13 @@ class ClientPlane():
         print("Cleaning successfully")
         
     def update_config(self, config, observer_config):
+        """
+        Update client_plane configurations 
+        :param config: experiment configurations
+        :type config: Configuration
+        :param observer_config: observer configurations
+        :type observer_config: ObserverConfiguration
+        """
         self.config = config
         self.observer_config = observer_config
         self.ClientType = self.config.CLIENT_TYPE
