@@ -1,10 +1,10 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-class FashionMNISTCNN(nn.Module):
+class FMNISTCNN(nn.Module):
 
     def __init__(self):
-        super(FashionMNISTCNN, self).__init__()
+        super(FMNISTCNN, self).__init__()
 
         self.layer1 = nn.Sequential(
             nn.Conv2d(1, 16, kernel_size=5, padding=2),

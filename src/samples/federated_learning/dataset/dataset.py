@@ -1,8 +1,8 @@
 from abc import abstractmethod
 class Dataset(): 
     
-    def __init__(self, configs):
-        self.configs = configs
+    def __init__(self, config):
+        self.config = config
         self.train_dataloader, self.train_dataset = self.load_train_data()
         self.test_dataloader, self.test_dataset  = self.load_test_data()
     

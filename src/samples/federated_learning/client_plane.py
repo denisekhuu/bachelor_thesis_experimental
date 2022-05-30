@@ -1,5 +1,6 @@
 from .configuration import Configuration
 from .dataset import Dataset
+from .client import Client
 import torch
 from numpy.random import default_rng
 
@@ -25,7 +26,6 @@ class ClientPlane():
         self.test_dataset = data.test_dataset
         self.train_dataloader = data.train_dataloader
         self.test_dataloader = data.test_dataloader
-        self.ClientType = self.config.CLIENT_TYPE
         self.clients = self.create_clients()
         self.poisoned_clients = []
         self.rounds = 0
@@ -81,7 +81,7 @@ class ClientPlane():
         distributed_datasets = self.divide_data_equally()
         distributed_dataloaders = self.create_distributed_dataloaders(distributed_datasets)
         print("Create {} clients with dataset of size {}".format(self.config.NUMBER_OF_CLIENTS, len(distributed_dataloaders[0].dataset)))
-        return [self.ClientType(self.config, self.observer_config, idx, dataloader, self.test_dataloader, self.shap_util) for idx, dataloader in enumerate(distributed_dataloaders)]
+        return [Client(self.config, self.observer_config, idx, dataloader, self.test_dataloader, self.shap_util) for idx, dataloader in enumerate(distributed_dataloaders)]
     
     def reset_client_nets(self):
         """

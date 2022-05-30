@@ -1,3 +1,3 @@
 from .cifar10_cnn import CIFAR10CNN
-from .fashion_mnist_cnn import FashionMNISTCNN
+from .fmnist_cnn import FMNISTCNN
 from .mnist_cnn import MNISTCNN

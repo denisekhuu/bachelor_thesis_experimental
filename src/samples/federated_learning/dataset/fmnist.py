@@ -1,11 +1,11 @@
 import torch, torchvision
 from .dataset import Dataset
 
-class FashionMNISTDataset(Dataset): 
+class FMNISTDataset(Dataset): 
     
-    def __init__(self, configs):
-        super(FashionMNISTDataset, self).__init__(configs)
-        self.labels = self.configs.MNIST_FASHION_LABELS
+    def __init__(self, config):
+        super(FMNISTDataset, self).__init__(config)
+        self.labels = self.config.FMNIST_LABELS
         
     def load_train_data(self):
         transform = torchvision.transforms.Compose([
@@ -15,13 +15,13 @@ class FashionMNISTDataset(Dataset):
         ])
         
         train_dataset = torchvision.datasets.FashionMNIST(
-            self.configs.MNIST_FASHION_DATASET_PATH, 
+            self.config.FMNIST_DATASET_PATH, 
             train=True, download=True,
             transform=transform)
         
         train_loader = torch.utils.data.DataLoader(
             train_dataset,
-            batch_size=self.configs.BATCH_SIZE_TRAIN, 
+            batch_size=self.config.BATCH_SIZE_TRAIN, 
             shuffle=True)
         
         
@@ -36,13 +36,13 @@ class FashionMNISTDataset(Dataset):
         ])
         
         test_dataset = torchvision.datasets.FashionMNIST(
-            self.configs.MNIST_FASHION_DATASET_PATH, 
+            self.config.FMNIST_DATASET_PATH, 
             train=False, download=True,
             transform=transform)
         
         test_loader = torch.utils.data.DataLoader(
             test_dataset,
-            batch_size=self.configs.BATCH_SIZE_TEST, 
+            batch_size=self.config.BATCH_SIZE_TEST, 
             shuffle=False)
         
         

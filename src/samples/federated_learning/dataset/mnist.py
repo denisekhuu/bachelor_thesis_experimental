@@ -3,20 +3,20 @@ from .dataset import Dataset
 
 class MNISTDataset(Dataset): 
     
-    def __init__(self, configs):
-        super(MNISTDataset, self).__init__(configs)
+    def __init__(self, config):
+        super(MNISTDataset, self).__init__(config)
         
     def load_train_data(self):
         transform = torchvision.transforms.Compose([torchvision.transforms.transforms.ToTensor()])
         
         train_dataset = torchvision.datasets.MNIST(
-            self.configs.MNIST_DATASET_PATH, 
+            self.config.MNIST_DATASET_PATH, 
             train=True, download=True,
             transform=transform)
         
         train_loader = torch.utils.data.DataLoader(
             train_dataset,
-            batch_size=self.configs.BATCH_SIZE_TRAIN, 
+            batch_size=self.config.BATCH_SIZE_TRAIN, 
             shuffle=True)
         
         print("MNIST training data loaded.")
@@ -26,13 +26,13 @@ class MNISTDataset(Dataset):
         transform = torchvision.transforms.Compose([torchvision.transforms.transforms.ToTensor()])
         
         test_dataset = torchvision.datasets.MNIST(
-            self.configs.MNIST_DATASET_PATH, 
+            self.config.MNIST_DATASET_PATH, 
             train=False, download=True,
             transform=transform)
         
         test_loader = torch.utils.data.DataLoader(
             test_dataset,
-            batch_size=self.configs.BATCH_SIZE_TEST, 
+            batch_size=self.config.BATCH_SIZE_TEST, 
             shuffle=False)
         
         print("MNIST test data loaded.")
