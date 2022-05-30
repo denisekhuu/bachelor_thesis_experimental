@@ -1,6 +1,8 @@
 from .configuration import Configuration
 from .dataset import Dataset
 import torch
+from numpy.random import default_rng
+
 
 class ClientPlane():
     
@@ -25,6 +27,7 @@ class ClientPlane():
         self.test_dataloader = data.test_dataloader
         self.ClientType = self.config.CLIENT_TYPE
         self.clients = self.create_clients()
+        self.poisoned_clients = []
     
     def divide_data_equally(self):
         """
@@ -55,15 +58,19 @@ class ClientPlane():
         :TODO poison subset of clients only
         """
         if self.config.DATA_POISONING_PERCENTAGE > 0:
-            print("Flip {}% of the {} labels to {}".format(self.config.DATA_POISONING_PERCENTAGE, self.config.FROM_LABEL, self.config.TO_LABEL))
-            for index, client in enumerate(self.clients):
+            print("Flip {}% of the {} labels to {}".format(self.config.DATA_POISONING_PERCENTAGE * 100., self.config.FROM_LABEL, self.config.TO_LABEL))
+            self.poisoned_clients = self.random_client_ids()
+            for index, client_index in enumerate(self.poisoned_clients):
                 if (index+1)%20 == 0:
-                    print("{}/{} clients poisoned".format(index+1, len(self.clients)))
-                client.label_flipping_data(from_label = self.config.FROM_LABEL, to_label = self.config.TO_LABEL, percentage = self.config.DATA_POISONING_PERCENTAGE)
+                    print("{}/{} clients poisoned".format(index+1, len(self.poisoned_clients)))
+                self.clients[client_index].label_flipping_data(from_label = self.config.FROM_LABEL, to_label = self.config.TO_LABEL, percentage = self.config.DATA_POISONING_PERCENTAGE)
         else: 
             print("No poisoning due to {}% poisoning rate".format(self.config.DATA_POISONING_PERCENTAGE * 100.))
             
-            
+    def random_client_ids(self): 
+        rng = default_rng()
+        return rng.choice(self.config.NUMBER_OF_CLIENTS, size=self.config.POISONED_CLIENTS, replace=False)
+        
 
     def create_clients(self):
         """

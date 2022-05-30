@@ -25,6 +25,7 @@ class Client():
         self.shap_util = shap_util
         self.net = self.config.NETWORK()
         self.observer = ClientObserver(self.config, self.observer_config, client_id, False, len(train_dataloader.dataset))
+        self.client_id = client_id
         
         # datasets
         self.train_dataloader = train_dataloader

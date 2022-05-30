@@ -29,19 +29,17 @@ class Configuration():
     N_EPOCHS = 10
     LEARNING_RATE = 0.01
     MOMENTUM = 0.5
-    LOG_INTERVAL = 100
-    CRITERION = nn.CrossEntropyLoss
+    LOG_INTERVAL = 200
     NETWORK = MNISTFFNN
     NUMBER_TARGETS = 10
     
     #Local Environment Configurations
-    NUMBER_OF_CLIENTS = 10
+    NUMBER_OF_CLIENTS = 100
     CLIENT_TYPE = FFNNClient
     DEVICE = device('cpu')
     
-    #Label Flipping Attack
-    POISONED = False
-    POISONED_CLIENTS = 0
+    #Label Flipping Attack 
+    POISONED_CLIENTS = 50
     DATA_POISONING_PERCENTAGE = 1
     FROM_LABEL = 5
     TO_LABEL = 4
