@@ -20,9 +20,9 @@ class MNISTClient(Client):
             loss = self.criterion(output.log(), target)
             loss.backward()
             self.optimizer.step()
-            if batch_idx % 100 == 0:
+            if (epoch+1) % self.config.LOG_INTERVAL == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                    epoch, batch_idx * len(data), len(self.train_dataloader.dataset),
+                    (epoch+1), batch_idx * len(data), len(self.train_dataloader.dataset),
                     100. * batch_idx / len(self.train_dataloader), loss.item()))
                 self.train_losses.append(loss.item())
                 self.train_counter.append((batch_idx*64) + ((epoch-1)*len(self.train_dataloader.dataset)))

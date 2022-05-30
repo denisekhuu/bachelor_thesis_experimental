@@ -17,3 +17,7 @@ class Observer(VMUtil):
         self.poisoned_clients = self.config.POISONED_CLIENTS
         self.test = self.observer_config.test
         self.dataset_type = self.observer_config.dataset_type
+        self.rounds = 0
+        
+    def set_rounds(self, rounds): 
+        self.rounds = rounds

@@ -44,7 +44,7 @@ class ClientObserver(Observer):
         """
         Creates Victoria Metrics meta data string
         """
-        return "client_id={},test={},poisoned={},poisoned_data={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={},num_of_epochs={},batch_size={},num_clients={},dataset_type={}".format(
+        return "client_id={},test={},poisoned={},poisoned_data={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={},num_of_epochs={},batch_size={},num_clients={},dataset_type={},rounds={}".format(
             self.client_id,
             self.test,
             self.poisoned,
@@ -57,7 +57,8 @@ class ClientObserver(Observer):
             self.num_epoch,
             self.batch_size,
             self.num_clients,
-            self.dataset_type
+            self.dataset_type,
+            self.rounds
         )
     
     def get_datastr(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean):
@@ -126,7 +127,7 @@ class ClientObserver(Observer):
         self.batch_size = self.config.BATCH_SIZE_TRAIN
         self.num_clients = self.config.NUMBER_OF_CLIENTS
         self.type = self.observer_config.client_type
-        
+
         
         
         

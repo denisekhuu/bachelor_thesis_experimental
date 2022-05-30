@@ -28,6 +28,7 @@ class ClientPlane():
         self.ClientType = self.config.CLIENT_TYPE
         self.clients = self.create_clients()
         self.poisoned_clients = []
+        self.rounds = 0
     
     def divide_data_equally(self):
         """
@@ -110,5 +111,25 @@ class ClientPlane():
         self.ClientType = self.config.CLIENT_TYPE
         for index, client in enumerate(self.clients):
             client.update_config(config, observer_config)
+            
+    def set_rounds(self, rounds):
+        self.rounds = rounds
+        for index, client in enumerate(self.clients):
+            client.set_rounds(rounds)
+            
+    def update_clients(self, new_parameters): 
+        for index, client in enumerate(self.clients):
+            client.update_nn_parameters(new_parameters)
         
+    def train_selected_clients(self, selected_ids):
+        for client_id in selected_ids: 
+            for epoch in range(self.rounds, self.rounds + 1):
+                self.clients[client_id].train(self.rounds)
+                
+        return [self.clients[client_id].get_nn_parameters() for client_id in selected_ids]
+            
+    def train_model(self, client):
+        for epoch in range(self.rounds, self.rounds + 1):
+            client.train(self.rounds)
+
             

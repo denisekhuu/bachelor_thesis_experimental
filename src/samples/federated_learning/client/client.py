@@ -3,6 +3,8 @@ import torch.optim as optim
 import torch.nn as nn
 import numpy as np
 from ..observer import ClientObserver
+import copy
+import os
 
 class Client(): 
     def __init__(self, config, observer_config, client_id, train_dataloader, test_dataloader, shap_util):
@@ -23,9 +25,10 @@ class Client():
         self.config = config
         self.observer_config = observer_config
         self.shap_util = shap_util
-        self.net = self.config.NETWORK()
+        self.net = self.load_default_model()
         self.observer = ClientObserver(self.config, self.observer_config, client_id, False, len(train_dataloader.dataset))
         self.client_id = client_id
+        self.rounds = 0
         
         # datasets
         self.train_dataloader = train_dataloader
@@ -61,6 +64,8 @@ class Client():
         self.poisoned_indices = []
         self.poisoning_indices = []
         
+        self.load_default_model()
+        
     def label_flipping_data(self, from_label, to_label, percentage=1): 
         """
         Label Flipping attack on distributed client 
@@ -83,9 +88,9 @@ class Client():
             self.is_poisoned = False
             self.observer.set_poisoned(False)
         
-    def set_net(self):
+    def reset_to_default_net(self):
         """
-        Set to untrained model net 
+        Set to untrained new model
         """
         self.net = self.config.NETWORK()
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.config.LEARNING_RATE, momentum=self.config.MOMENTUM)
@@ -95,6 +100,16 @@ class Client():
         Set model to previous default parameters
         """
         self.net.apply(self.weight_reset)
+        
+    def set_net(self, net):
+        """
+        Set the client's NN.
+
+        :param net: torch.nn
+        """
+        self.net = net
+        self.net.to(self.device)
+        
         
     def weight_reset(self, m):
         """
@@ -175,5 +190,37 @@ class Client():
         self.non_zero_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
         self.observer.update_config(config, observer_config)
         
+    def set_rounds(self, rounds):
+        self.rounds = rounds
+        self.observer.set_rounds(rounds)
+            
+    def update_nn_parameters(self, new_params):
+        """
+        Update the NN's parameters.
+
+        :param new_params: New weights for the neural network
+        :type new_params: dict
+        """
+        self.net.load_state_dict(copy.deepcopy(new_params), strict=True)
         
-        
+    def get_nn_parameters(self):
+        """
+        Return the NN's parameters.
+        """
+        return self.net.state_dict()
+    
+    def load_default_model(self):
+        """
+        Load a model from a file to achive a common default behavior
+        """
+        path = os.path.join(self.config.TEMP, 'models', "{}.model".format(self.config.MODELNAME))
+        if os.path.exists(path):
+            try:
+                model = self.config.NETWORK()
+                model.load_state_dict(torch.load(path))
+                model.eval()
+            except:
+                print("Couldn't load model")
+        else:
+            print("Could not find model: {}".format(self.default_model_path))
+        return model

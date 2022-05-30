@@ -29,7 +29,7 @@ class Configuration():
     N_EPOCHS = 1
     LEARNING_RATE = 0.01
     MOMENTUM = 0.5
-    LOG_INTERVAL = 200
+    LOG_INTERVAL = 100
     
     # Model Type Configurations
     MODELNAME = "MNISTCNN"
@@ -37,15 +37,19 @@ class Configuration():
     CLIENT_TYPE = MNISTClient
     NUMBER_TARGETS = 10
     
+    # Temp Folder 
+    TEMP = os.path.join('./temp')
+    
     #Local Environment Configurations
     NUMBER_OF_CLIENTS = 200
+    CLIENTS_PER_ROUND = 5
     DEVICE = device('cpu')
     
     #Label Flipping Attack 
     POISONED_CLIENTS = 50
     DATA_POISONING_PERCENTAGE = 1
-    FROM_LABEL = 5
-    TO_LABEL = 4
+    FROM_LABEL = 0
+    TO_LABEL = 9
     
     #Victoria Metrics Configurations
     VM_URL = os.getenv('VM_URL') #URL settings in docker-compose.yml
