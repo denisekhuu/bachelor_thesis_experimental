@@ -6,14 +6,16 @@ from pathlib import Path
 import os
 from .model_aggregator import ModelAggregator
 from .client_selector import ClientSelector
+from ..observer import ServerObserver
 import numpy as np
 
 class Server():
-    def __init__(self, config, test_loader, shap_util):
+    def __init__(self, config, observer_config, test_loader, shap_util):
         self.config = config
         self.default_model_path = os.path.join(self.config.TEMP, 'models', "{}.model".format(self.config.MODELNAME))
         self.net = self.load_default_model()
         self.test_dataloader = test_loader
+        self.observer = ServerObserver(config, observer_config)
         self.rounds = 0
         
         self.aggregator = ModelAggregator()
@@ -43,12 +45,14 @@ class Server():
     
     def set_rounds(self, rounds):
         self.rounds = rounds
+        self.observer.set_rounds(rounds)
         
     def create_default_model(self):
         net = self.config.NETWORK()
         Path(os.path.dirname(self.default_model_path)).mkdir(parents=True, exist_ok=True)
         torch.save(net.state_dict(), self.default_model_path)
         print("default model saved to:{}".format(os.path.dirname(self.default_model_path)))
+        self.load_default_model()
     
     def load_default_model(self):
         """
@@ -99,8 +103,10 @@ class Server():
         if not self.e: 
             self.e = self.shap_util.set_deep_explainer(self.net)
         self.shap_values = self.shap_util.get_shap_values(self.e)
+        
+    def get_shap_predictions(self):
         self.shap_prediction = self.shap_util.predict(self.net)
-    
+        
     def set_explainer(self): 
         self.e = self.shap_util.deep_explainer(self.net)
     
@@ -144,10 +150,9 @@ class Server():
         for i in range(self.config.NUMBER_TARGETS):
             self.positive_shap[i] = [np.sum(np.array(arr) > 0) for arr in self.shap_values[i]]
             self.negative_shap[i] = [np.sum(np.array(arr) < 0) for arr in self.shap_values[i]]
-            self.positive_shap_mean[i] = [arr[(np.array(arr) > 0)].mean for arr in self.shap_values[i]]
-            self.negative_shap_mean[i] = [arr[(np.array(arr) < 0)].mean for arr in self.shap_values[i]]
             self.non_zero_mean[i] = [arr[np.nonzero(arr)].mean() for arr in self.shap_values[i]]
-            
+            self.positive_shap_mean[i] = [arr[np.array(arr) > 0].mean() for arr in self.shap_values[i]]
+            self.negative_shap_mean[i] = [arr[np.array(arr) < 0].mean() for arr in self.shap_values[i]]
             
     def analize(self):
         """

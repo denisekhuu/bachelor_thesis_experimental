@@ -48,7 +48,7 @@ class ServerObserver(Observer):
             self.rounds
         )
     
-    def get_datastr(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean, pos_shap_mean, neg_shap_mean):
+    def get_datastr(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean, shap_pos_mean, shap_neg_mean):
         """
         Creates data string for victoria metrics
         :param accuracy: test accuracy 
@@ -76,8 +76,8 @@ class ServerObserver(Observer):
                 data.append(datastr.format(self.name, labels + self.metric_labels["shap_pos"].format(i, j), "shap_pos=%f"%(shap_pos[i][j]), timestamp))
                 data.append(datastr.format(self.name, labels + self.metric_labels["shap_neg"].format(i, j), "shap_neg=%f"%(shap_neg[i][j]), timestamp))
                 data.append(datastr.format(self.name, labels + self.metric_labels["shap_mean"].format(i, j), "shap_mean=%f"%(shap_mean[i][j]), timestamp))
-                data.append(datastr.format(self.name, labels + self.metric_labels["shap_pos_mean"].format(i, j), "shap_pos_mean=%f"%(shap_mean[i][j]), timestamp))
-                data.append(datastr.format(self.name, labels + self.metric_labels["shap_neg_mean"].format(i, j), "shap_neg_mean=%f"%(shap_mean[i][j]), timestamp))
+                data.append(datastr.format(self.name, labels + self.metric_labels["shap_pos_mean"].format(i, j), "shap_pos_mean=%f"%(shap_pos_mean[i][j]), timestamp))
+                data.append(datastr.format(self.name, labels + self.metric_labels["shap_neg_mean"].format(i, j), "shap_neg_mean=%f"%(shap_neg_mean[i][j]), timestamp))
         return data
     
     def push_metrics(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean, pos_shap_mean, neg_shap_mean):
@@ -100,7 +100,7 @@ class ServerObserver(Observer):
         data = self.get_datastr(accuracy, recall, precision, shap_pos, shap_neg, shap_mean, pos_shap_mean, neg_shap_mean)
         for d in data:
             self.push_data(d)
-        print("Successfully pushed client data to victoria metrics")
+        print("Successfully pushed server data to victoria metrics")
     
     def update_config(self, config, observer_config):
         """

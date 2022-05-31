@@ -42,29 +42,17 @@ class Client():
         self.test_dataloader = test_dataloader
         
         # loss metrics
-        self.train_losses = []
-        self.train_counter = []
-        self.test_losses = []
-        self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.config.N_EPOCHS)]
+        #self.train_losses = []
+        #self.train_counter = []
+        #self.test_losses = []
+        #self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.config.N_EPOCHS)]
         
         # raw performance measures
         self.confusion_matrix = torch.zeros(self.config.NUMBER_TARGETS, self.config.NUMBER_TARGETS)
         self.correct = 0
         
-        # derived metrics
-        self.accuracy = 0
-        self.recall = []
-        self.precision = []
-        
         # SHAP utils
         self.e = None
-        self.shap_values = []
-        self.shap_prediction = []
-        
-        # SHAP metrics
-        self.positive_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
-        self.negative_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
-        self.non_zero_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
         
         # label flipping meta data
         self.is_poisoned = False
@@ -87,8 +75,8 @@ class Client():
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     (epoch+1), batch_idx * len(data), len(self.train_dataloader.dataset),
                     100. * batch_idx / len(self.train_dataloader), loss.item()))
-                self.train_losses.append(loss.item())
-                self.train_counter.append((batch_idx*64) + ((epoch-1)*len(self.train_dataloader.dataset)))
+                #self.train_losses.append(loss.item())
+                #self.train_counter.append((batch_idx*64) + ((epoch-1)*len(self.train_dataloader.dataset)))
         
     def test(self):
         self.net.eval()
@@ -110,7 +98,7 @@ class Client():
         print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
             test_loss, correct, len(self.test_dataloader.dataset),
             100. * correct / len(self.test_dataloader.dataset)))
-        self.test_losses.append(test_loss)
+        #self.test_losses.append(test_loss)
         
         
     def label_flipping_data(self, from_label, to_label, percentage=1): 
@@ -171,8 +159,10 @@ class Client():
         """
         if not self.e: 
             self.e = self.shap_util.set_deep_explainer(self.net)
-        self.shap_values = self.shap_util.get_shap_values(self.e)
-        self.shap_prediction = self.shap_util.predict(self.net)
+        return self.shap_util.get_shap_values(self.e)
+    
+    def get_shap_predictions(self):
+        return self.shap_util.predict(self.net)
         
     def set_explainer(self): 
         self.e = self.shap_util.deep_explainer(self.net)
@@ -187,38 +177,50 @@ class Client():
         """
         Calculate test metrics like accuracy, precision and recall
         """
-        self.recall = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
-        self.precision = self.confusion_matrix.diag()/self.confusion_matrix.sum(0)
-        self.accuracy = self.correct / len(self.test_dataloader.dataset)
-        self.precision[torch.isnan(self.precision)] = 0
-        self.recall[torch.isnan(self.recall)] = 0
+        recall = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
+        precision = self.confusion_matrix.diag()/self.confusion_matrix.sum(0)
+        accuracy = self.correct / len(self.test_dataloader.dataset)
+        precision[torch.isnan(precision)] = 0
+        recall[torch.isnan(recall)] = 0
+        return recall, precision, accuracy
         
         
-    def analize_shap_values(self): 
+    def analize_shap_values(self, shap_values): 
         """
         Calculate SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
         """
+        positive_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
+        negative_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
+        positive_shap_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
+        negative_shap_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
+        non_zero_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
         for i in range(self.config.NUMBER_TARGETS):
-            self.positive_shap[i] = [np.sum(np.array(arr) > 0) for arr in self.shap_values[i]]
-            self.negative_shap[i] = [np.sum(np.array(arr) < 0) for arr in self.shap_values[i]]
-            self.non_zero_mean[i] = [arr[np.nonzero(arr)].mean() for arr in self.shap_values[i]]
+            positive_shap[i] = [np.sum(np.array(arr) > 0) for arr in shap_values[i]]
+            negative_shap[i] = [np.sum(np.array(arr) < 0) for arr in shap_values[i]]
+            positive_shap_mean[i] = [arr[np.array(arr) > 0].mean() for arr in shap_values[i]]
+            negative_shap_mean[i] = [arr[np.array(arr) < 0].mean() for arr in shap_values[i]]
+            non_zero_mean[i] = [arr[np.nonzero(arr)].mean() for arr in shap_values[i]]
             
+        
+        return positive_shap, negative_shap, non_zero_mean, positive_shap_mean, negative_shap_mean
+
     def analize(self):
         """
         Calculate SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
         and test metrics like accuracy, precision and recall
         """
-        self.analize_test()
-        self.get_shap_values()
-        self.analize_shap_values()
+        recall, precision, accuracy = self.analize_test()
+        shap_values = self.get_shap_values()
+        positive_shap, negative_shap, non_zero_mean, positive_shap_mean, negative_shap_mean = self.analize_shap_values(shap_values)
+        return recall, precision, accuracy, positive_shap, negative_shap, non_zero_mean, positive_shap_mean, negative_shap_mean
     
-    def push_metrics(self): 
+    def push_metrics(self, timestamp=None): 
         """
         Push SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
         and test metrics like accuracy, precision and recall to victoria metrics
         """
-        self.analize()
-        self.observer.push_metrics(self.accuracy, self.recall, self.precision, self.positive_shap, self.negative_shap, self.non_zero_mean)
+        recall, precision, accuracy, positive_shap, negative_shap, non_zero_mean, positive_shap_mean, negative_shap_mean = self.analize()
+        self.observer.push_metrics(recall, precision, accuracy, positive_shap, negative_shap, non_zero_mean, positive_shap_mean, negative_shap_mean, timestamp)
         
     def update_config(self, config, observer_config):
         """
@@ -230,11 +232,7 @@ class Client():
         """
         self.config = config
         self.observer_config = observer_config
-        self.test_counter = [i*len(self.train_dataloader.dataset) for i in range(self.config.N_EPOCHS)]
         self.confusion_matrix = torch.zeros(self.config.NUMBER_TARGETS, self.config.NUMBER_TARGETS)
-        self.positive_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
-        self.negative_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
-        self.non_zero_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
         self.observer.update_config(config, observer_config)
         
     def set_rounds(self, rounds):
@@ -249,6 +247,7 @@ class Client():
         :type new_params: dict
         """
         self.net.load_state_dict(copy.deepcopy(new_params), strict=True)
+        self.net.eval()
         
     def get_nn_parameters(self):
         """

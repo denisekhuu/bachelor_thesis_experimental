@@ -45,7 +45,7 @@ class Configuration():
     DEVICE = device('cpu')
     
     #Label Flipping Attack 
-    POISONED_CLIENTS = 50
+    POISONED_CLIENTS = 0
     DATA_POISONING_PERCENTAGE = 1
     FROM_LABEL = 0
     TO_LABEL = 9

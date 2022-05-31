@@ -59,12 +59,15 @@ class ClientPlane():
         :TODO poison subset of clients only
         """
         if self.config.DATA_POISONING_PERCENTAGE > 0:
-            print("Flip {}% of the {} labels to {}".format(self.config.DATA_POISONING_PERCENTAGE * 100., self.config.FROM_LABEL, self.config.TO_LABEL))
-            self.poisoned_clients = self.random_client_ids()
-            for index, client_index in enumerate(self.poisoned_clients):
-                if (index+1)%20 == 0:
-                    print("{}/{} clients poisoned".format(index+1, len(self.poisoned_clients)))
-                self.clients[client_index].label_flipping_data(from_label = self.config.FROM_LABEL, to_label = self.config.TO_LABEL, percentage = self.config.DATA_POISONING_PERCENTAGE)
+            if self.config.POISONED_CLIENTS > 0:
+                print("Flip {}% of the {} labels to {}".format(self.config.DATA_POISONING_PERCENTAGE * 100., self.config.FROM_LABEL, self.config.TO_LABEL))
+                self.poisoned_clients = self.random_client_ids()
+                for index, client_index in enumerate(self.poisoned_clients):
+                    if (index+1)%20 == 0:
+                        print("{}/{} clients poisoned".format(index+1, len(self.poisoned_clients)))
+                    self.clients[client_index].label_flipping_data(from_label = self.config.FROM_LABEL, to_label = self.config.TO_LABEL, percentage = self.config.DATA_POISONING_PERCENTAGE)
+            else: 
+                print("No poisoning due to 0. poisoned clients")
         else: 
             print("No poisoning due to {}% poisoning rate".format(self.config.DATA_POISONING_PERCENTAGE * 100.))
             
@@ -90,6 +93,14 @@ class ClientPlane():
         for index, client in enumerate(self.clients):
             client.reset_net()
         print("Reset networks successfully")
+        
+    def load_default_client_nets(self):
+        """
+        Reset client's net to default
+        """
+        for index, client in enumerate(self.clients):
+            client.load_default_model()
+        print("Load default model successfully")
             
     def reset_poisoning_attack(self):
         for index, client in enumerate(self.clients):
@@ -108,7 +119,6 @@ class ClientPlane():
         """
         self.config = config
         self.observer_config = observer_config
-        self.ClientType = self.config.CLIENT_TYPE
         for index, client in enumerate(self.clients):
             client.update_config(config, observer_config)
             
