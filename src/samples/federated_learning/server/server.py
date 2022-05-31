@@ -1,11 +1,12 @@
 import torch
+import torch.optim as optim
+import torch.nn as nn
+from torch.nn import functional as F
 from pathlib import Path
 import os
 from .model_aggregator import ModelAggregator
 from .client_selector import ClientSelector
-import torch.optim as optim
-import torch.nn as nn
-from torch.nn import functional as F
+import numpy as np
 
 class Server():
     def __init__(self, config, test_loader, shap_util):
@@ -21,6 +22,15 @@ class Server():
         #SHAP utils
         self.shap_util = shap_util
         self.e = []
+        self.shap_values = []
+        self.shap_prediction = []
+        
+        # SHAP metrics
+        self.positive_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.negative_shap = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.positive_shap_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.negative_shap_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
+        self.non_zero_mean = [[] for i in range(self.config.NUMBER_TARGETS)]
         
         #Test utils
         self.criterion = F.nll_loss if self.config.MODELNAME == self.config.MNIST_NAME else nn.CrossEntropyLoss()
@@ -111,9 +121,48 @@ class Server():
                     self.confusion_matrix[t.long(), p.long()] += 1
         test_loss /= len(self.test_dataloader.dataset)
         self.correct = correct
-        print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        print('\nServer Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
             test_loss, correct, len(self.test_dataloader.dataset),
             100. * correct / len(self.test_dataloader.dataset)))
         self.test_losses.append(test_loss)
         
+    def analize_test(self):
+        """
+        Calculate test metrics like accuracy, precision and recall
+        """
+        self.recall = self.confusion_matrix.diag()/self.confusion_matrix.sum(1)
+        self.precision = self.confusion_matrix.diag()/self.confusion_matrix.sum(0)
+        self.accuracy = self.correct / len(self.test_dataloader.dataset)
+        self.precision[torch.isnan(self.precision)] = 0
+        self.recall[torch.isnan(self.recall)] = 0
+        
+        
+    def analize_shap_values(self): 
+        """
+        Calculate SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
+        """
+        for i in range(self.config.NUMBER_TARGETS):
+            self.positive_shap[i] = [np.sum(np.array(arr) > 0) for arr in self.shap_values[i]]
+            self.negative_shap[i] = [np.sum(np.array(arr) < 0) for arr in self.shap_values[i]]
+            self.positive_shap_mean[i] = [arr[(np.array(arr) > 0)].mean for arr in self.shap_values[i]]
+            self.negative_shap_mean[i] = [arr[(np.array(arr) < 0)].mean for arr in self.shap_values[i]]
+            self.non_zero_mean[i] = [arr[np.nonzero(arr)].mean() for arr in self.shap_values[i]]
+            
+            
+    def analize(self):
+        """
+        Calculate SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
+        and test metrics like accuracy, precision and recall
+        """
+        self.analize_test()
+        self.get_shap_values()
+        self.analize_shap_values()
+    
+    def push_metrics(self): 
+        """
+        Push SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
+        and test metrics like accuracy, precision and recall to victoria metrics
+        """
+        self.analize()
+        self.observer.push_metrics(self.accuracy, self.recall, self.precision, self.positive_shap, self.negative_shap, self.non_zero_mean,self.positive_shap_mean, self.negative_shap_mean)
         

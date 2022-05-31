@@ -3,7 +3,6 @@ import torch.nn as nn
 from torch import device
 from .nets import MNISTCNN, FMNISTCNN
 from .dataset import MNISTDataset, FMNISTDataset
-from .client import Client
 
 class Configuration():
     
