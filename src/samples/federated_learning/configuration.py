@@ -47,8 +47,8 @@ class Configuration():
     #Label Flipping Attack 
     POISONED_CLIENTS = 0
     DATA_POISONING_PERCENTAGE = 1
-    FROM_LABEL = 0
-    TO_LABEL = 9
+    FROM_LABEL = 5
+    TO_LABEL = 4
     
     #Victoria Metrics Configurations
     VM_URL = os.getenv('VM_URL') #URL settings in docker-compose.yml

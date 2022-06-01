@@ -59,8 +59,6 @@ class Client():
         self.poisoned_indices = []
         self.poisoning_indices = []
         
-        self.load_default_model()
-        
     def train(self, epoch):
         self.net.train()
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
@@ -234,6 +232,9 @@ class Client():
         self.observer_config = observer_config
         self.confusion_matrix = torch.zeros(self.config.NUMBER_TARGETS, self.config.NUMBER_TARGETS)
         self.observer.update_config(config, observer_config)
+        self.optimizer = optim.SGD(self.net.parameters(), lr=self.config.LEARNING_RATE, momentum=self.config.MOMENTUM)
+        self.criterion = F.nll_loss if self.config.MODELNAME == self.config.MNIST_NAME else nn.CrossEntropyLoss()
+        
         
     def set_rounds(self, rounds):
         self.rounds = rounds

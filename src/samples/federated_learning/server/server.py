@@ -171,3 +171,9 @@ class Server():
         self.analize()
         self.observer.push_metrics(self.accuracy, self.recall, self.precision, self.positive_shap, self.negative_shap, self.non_zero_mean,self.positive_shap_mean, self.negative_shap_mean)
         
+    def update_config(self, config, observer_config):
+        self.config = config
+        self.default_model_path = os.path.join(self.config.TEMP, 'models', "{}.model".format(self.config.MODELNAME))
+        # raw performance measures
+        self.confusion_matrix = torch.zeros(self.config.NUMBER_TARGETS, self.config.NUMBER_TARGETS)
+        self.observer.update_config(config, observer_config)

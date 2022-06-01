@@ -1,0 +1,37 @@
+import random
+
+def set_rounds(rounds, client_plane, server):
+    client_plane.set_rounds(rounds)
+    server.set_rounds(rounds)
+    
+def update_configs(client_plane, server):
+    client_plane.update_config(config, observer_config)
+    server.update_config(config, observer_config)
+    
+def run_round(rounds, client_plane, server):
+    # Federated Learning Round 
+    set_rounds(rounds, client_plane, server)
+    client_plane.update_clients(server.get_nn_parameters())
+    selected_clients = server.select_clients()
+    client_parameters = client_plane.train_selected_clients(selected_clients)
+    server.aggregate_model(client_parameters)
+
+def select_random_clean(n, config, client_plane):
+    indices = []
+    for i in range(n):
+        idx = random.randint(0,config.NUMBER_OF_CLIENTS)
+        while idx in client_plane.poisoned_clients:
+            idx = random.randint(0,config.NUMBER_OF_CLIENTS)
+        indices.append(idx)
+    return indices
+
+def select_poisoned(n, client_plane):
+        return client_plane.poisoned_clients[:n]
+
+def train_client(idx, rounds, client_plane): 
+    client_plane.clients[idx].train(rounds)
+    client_plane.clients[idx].push_metrics()
+
+def print_posioned_target(idx, client_plane):
+    client = client_plane.clients[idx]
+    print(client.train_dataloader.dataset.dataset.targets[client.poisoned_indices][0])

@@ -21,3 +21,12 @@ class Observer(VMUtil):
         
     def set_rounds(self, rounds): 
         self.rounds = rounds
+
+    def update_config(self, config, observer_config):
+        self.config = config
+        self.observer_config = observer_config
+        self.experiment_type = self.observer_config.experiment_type
+        self.experiment_id = self.observer_config.experiment_id
+        self.poisoned_clients = self.config.POISONED_CLIENTS
+        self.test = self.observer_config.test
+        self.dataset_type = self.observer_config.dataset_type

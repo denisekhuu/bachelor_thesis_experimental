@@ -60,6 +60,7 @@ class ClientPlane():
         """
         if self.config.DATA_POISONING_PERCENTAGE > 0:
             if self.config.POISONED_CLIENTS > 0:
+                print("Poison {}/{} clients".format(self.config.POISONED_CLIENTS, self.config.NUMBER_OF_CLIENTS))
                 print("Flip {}% of the {} labels to {}".format(self.config.DATA_POISONING_PERCENTAGE * 100., self.config.FROM_LABEL, self.config.TO_LABEL))
                 self.poisoned_clients = self.random_client_ids()
                 for index, client_index in enumerate(self.poisoned_clients):
@@ -139,7 +140,7 @@ class ClientPlane():
         return [self.clients[client_id].get_nn_parameters() for client_id in selected_ids]
             
     def train_model(self, client):
-        for epoch in range(self.rounds, self.rounds + 1):
+        for epoch in range(self.rounds, self.rounds + self.config.N_EPOCHS):
             client.train(self.rounds)
 
             

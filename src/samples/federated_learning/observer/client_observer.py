@@ -21,7 +21,7 @@ class ClientObserver(Observer):
         self.name = self.observer_config.client_name 
         self.client_id = client_id
         self.poisoned = poisoned
-        self.poisoned_data = self.config.DATA_POISONING_PERCENTAGE
+        self.poisoned_data = self.config.DATA_POISONING_PERCENTAGE if poisoned else 0
         self.num_epoch = self.config.N_EPOCHS
         self.batch_size = self.config.BATCH_SIZE_TRAIN
         self.num_clients = self.config.NUMBER_OF_CLIENTS
@@ -47,11 +47,12 @@ class ClientObserver(Observer):
         """
         Creates Victoria Metrics meta data string
         """
-        return "client_id={},test={},poisoned={},poisoned_data={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={},num_of_epochs={},batch_size={},num_clients={},dataset_type={},round={}".format(
+        return "client_id={},test={},poisoned={},poisoned_data={},poisoned_clients={},dataset_size={},type={},experiment_type={},experiment_id={},poisoned_clients={},num_of_epochs={},batch_size={},num_clients={},dataset_type={},round={}".format(
             self.client_id,
             self.test,
             self.poisoned,
             self.poisoned_data,
+            self.poisoned_clients,
             self.dataset_size,
             self.type,
             self.experiment_type,
@@ -127,6 +128,7 @@ class ClientObserver(Observer):
         :param observer_config: observer configurations
         :type observer_config: ObserverConfiguration
         """
+        super().update_config(config, observer_config)
         self.name = self.observer_config.client_name 
         self.poisoned_data = self.config.DATA_POISONING_PERCENTAGE
         self.num_epoch = self.config.N_EPOCHS

@@ -110,6 +110,7 @@ class ServerObserver(Observer):
         :param observer_config: observer configurations
         :type observer_config: ObserverConfiguration
         """
+        super().update_config(config, observer_config)
         self.name = self.observer_config.server_name 
         self.num_rounds = self.config.ROUNDS
         self.num_clients = self.config.NUMBER_OF_CLIENTS
