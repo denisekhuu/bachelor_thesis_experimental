@@ -54,7 +54,7 @@ class Client(CNNHandler):
 
     def random_label_flipping_data(self, percentage=1): 
         """
-        Label Flipping attack on distributed client 
+        Label Flipping attack on distributed client with random assignments
         :param from_label: label to be flipped
         :type from_label: 
         :param to_label: label flipped to

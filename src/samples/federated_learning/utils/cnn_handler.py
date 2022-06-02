@@ -39,9 +39,6 @@ class CNNHandler():
         self.confusion_matrix = torch.zeros(self.config.NUMBER_TARGETS, self.config.NUMBER_TARGETS)
         self.correct = 0
 
-        # SHAP utils
-        self.e = None
-
     def train(self, epoch):
         self.net.train()
         for batch_idx, (data, target) in enumerate(self.train_dataloader):
@@ -107,15 +104,11 @@ class CNNHandler():
         """
         Calculate SHAP values and SHAP image predictions 
         """
-        if not self.e: 
-            self.e = self.shap_util.set_deep_explainer(self.net)
-        return self.shap_util.get_shap_values(self.e)
+        e = self.shap_util.set_deep_explainer(self.net)
+        return self.shap_util.get_shap_values(e)
     
     def get_shap_predictions(self):
         return self.shap_util.predict(self.net)
-    
-    def set_explainer(self): 
-        self.e = self.shap_util.deep_explainer(self.net)
         
     def plot_shap_values(self, file=None):
         """
