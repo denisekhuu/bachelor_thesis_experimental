@@ -1,2 +1,0 @@
-class NN_Handler():
-    

@@ -74,7 +74,9 @@ class ClientPlane():
             
     def random_client_ids(self): 
         rng = default_rng()
-        return rng.choice(self.config.NUMBER_OF_CLIENTS, size=self.config.POISONED_CLIENTS, replace=False)
+        choice = rng.choice(self.config.NUMBER_OF_CLIENTS, size=self.config.POISONED_CLIENTS, replace=False)
+        print(choice)
+        return choice
         
 
     def create_clients(self):
@@ -85,7 +87,7 @@ class ClientPlane():
         distributed_datasets = self.divide_data_equally()
         distributed_dataloaders = self.create_distributed_dataloaders(distributed_datasets)
         print("Create {} clients with dataset of size {}".format(self.config.NUMBER_OF_CLIENTS, len(distributed_dataloaders[0].dataset)))
-        return [Client(self.config, self.observer_config, idx, dataloader, self.test_dataloader, self.shap_util) for idx, dataloader in enumerate(distributed_dataloaders)]
+        return [Client(self.config, self.observer_config, dataloader, self.test_dataloader, self.shap_util, idx) for idx, dataloader in enumerate(distributed_dataloaders)]
     
     def reset_client_nets(self):
         """
@@ -95,12 +97,12 @@ class ClientPlane():
             client.reset_net()
         print("Reset networks successfully")
         
-    def load_default_client_nets(self):
+    def reset_default_client_nets(self):
         """
         Reset client's net to default
         """
         for index, client in enumerate(self.clients):
-            client.load_default_model()
+            client.reset_to_default_net()
         print("Load default model successfully")
             
     def reset_poisoning_attack(self):

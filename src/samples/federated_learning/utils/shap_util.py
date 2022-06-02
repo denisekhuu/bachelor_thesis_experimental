@@ -83,7 +83,7 @@ class SHAPUtil():
         print("Predictions:", pred)
         return pred
     
-    def plot(self, shap_values, file):
+    def plot(self, shap_values, file=None):
         """
         Plot SHAP values and image
         :param shap_values: name of file
@@ -94,8 +94,10 @@ class SHAPUtil():
         import matplotlib.pyplot as plt
         shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in shap_values]
         test_numpy = np.swapaxes(np.swapaxes(self.shap_images.numpy(), 1, -1), 1, 2)
-        shap.image_plot(shap_numpy, -test_numpy, show=False)
-        if not os.path.exists(os.path.dirname(file)):
-            os.makedirs(os.path.dirname(file))
-        plt.savefig(file)
-        
+        if file:
+            shap.image_plot(shap_numpy*10, -test_numpy, show=False)
+            if not os.path.exists(os.path.dirname(file)):
+                os.makedirs(os.path.dirname(file))
+            plt.savefig(file)
+        else: 
+            shap.image_plot(shap_numpy, -test_numpy)

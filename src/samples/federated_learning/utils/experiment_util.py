@@ -20,7 +20,7 @@ def select_random_clean(n, config, client_plane):
     indices = []
     for i in range(n):
         idx = random.randint(0,config.NUMBER_OF_CLIENTS)
-        while idx in client_plane.poisoned_clients:
+        while idx in client_plane.poisoned_clients or idx in indices:
             idx = random.randint(0,config.NUMBER_OF_CLIENTS)
         indices.append(idx)
     return indices
@@ -35,3 +35,5 @@ def train_client(idx, rounds, client_plane):
 def print_posioned_target(idx, client_plane):
     client = client_plane.clients[idx]
     print(client.train_dataloader.dataset.dataset.targets[client.poisoned_indices][0])
+    
+    

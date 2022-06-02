@@ -47,8 +47,8 @@ class ServerObserver(Observer):
             self.dataset_type,
             self.rounds
         )
-    
-    def get_datastr(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean, shap_pos_mean, shap_neg_mean):
+
+    def get_datastr(self, recall, precision, accuracy, shap_pos, shap_neg, shap_mean, shap_pos_mean, shap_neg_mean, timestamp=None):
         """
         Creates data string for victoria metrics
         :param accuracy: test accuracy 
@@ -64,7 +64,8 @@ class ServerObserver(Observer):
         :param shap_mean: mean of SHAP values
         :type  shap_mean: Tensor
         """
-        timestamp = int(datetime.timestamp(datetime.now()))
+        if not timestamp:
+            timestamp = int(datetime.timestamp(datetime.now()))
         data = []
         labels = self.get_labels()
         datastr = "{},{} {} {}"
@@ -80,7 +81,7 @@ class ServerObserver(Observer):
                 data.append(datastr.format(self.name, labels + self.metric_labels["shap_neg_mean"].format(i, j), "shap_neg_mean=%f"%(shap_neg_mean[i][j]), timestamp))
         return data
     
-    def push_metrics(self, accuracy, recall, precision, shap_pos, shap_neg, shap_mean, pos_shap_mean, neg_shap_mean):
+    def push_metrics(self, recall, precision, accuracy, shap_pos, shap_neg, shap_mean, shap_pos_mean, shap_neg_mean, timestamp=None):
         """
         Push SHAP metrics like number of positive and negativ SHAP values as well as non-zero-mean
         and test metrics like accuracy, precision and recall to victoria metrics
@@ -97,7 +98,7 @@ class ServerObserver(Observer):
         :param shap_mean: mean of SHAP values
         :type  shap_mean: Tensor
         """
-        data = self.get_datastr(accuracy, recall, precision, shap_pos, shap_neg, shap_mean, pos_shap_mean, neg_shap_mean)
+        data = self.get_datastr(recall, precision, accuracy, shap_pos, shap_neg, shap_mean, shap_pos_mean, shap_neg_mean, timestamp)
         for d in data:
             self.push_data(d)
         print("Successfully pushed server data to victoria metrics")
