@@ -20,6 +20,7 @@ class Configuration():
     MNIST_DATASET_PATH = os.path.join('./data/mnist')
     
     #CIFAR_DATASET Configurations
+    CIFAR10_NAME = "CIFAR10"
     CIFAR10_DATASET_PATH = os.path.join('./data/cifar10')
     CIFAR10_LABELS = ['Plane', 'Car', 'Bird', 'Cat','Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     

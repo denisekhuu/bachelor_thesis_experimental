@@ -29,7 +29,7 @@ class CNNHandler():
 
         # training config
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.config.LEARNING_RATE, momentum=self.config.MOMENTUM)
-        self.criterion = F.nll_loss if self.config.MODELNAME == self.config.MNIST_NAME else nn.CrossEntropyLoss()
+        self.criterion = F.nll_loss if self.config.MODELNAME != self.config.CIFAR10_NAME else nn.CrossEntropyLoss()
 
         # datasets
         self.train_dataloader = train_dataloader
@@ -45,7 +45,7 @@ class CNNHandler():
             data, target = data.to(self.config.DEVICE), target.to(self.config.DEVICE)
             self.optimizer.zero_grad()
             output = self.net(data)
-            out = output.log() if self.config.MODELNAME == self.config.MNIST_NAME else output
+            out = output.log() if self.config.MODELNAME != self.config.CIFAR10_NAME else output
             loss = self.criterion(out, target)
             loss.backward()
             self.optimizer.step()
@@ -64,9 +64,9 @@ class CNNHandler():
             for data, target in self.test_dataloader:
                 data, target = data.to(self.config.DEVICE), target.to(self.config.DEVICE)
                 output = self.net(data)
-                out = output.log() if self.config.MODELNAME == self.config.MNIST_NAME else output
+                out = output.log() if self.config.MODELNAME != self.config.CIFAR10_NAME else output
                 test_loss += self.criterion(out, target).item()  # sum up batch loss
-                pred = output.max(1, keepdim=True)[1] # get the index of the max log-probability
+                pred = out.max(1, keepdim=True)[1] # get the index of the max log-probability
                 correct += pred.eq(target.view_as(pred)).sum().item()
                 for t, p in zip(target.view(-1), pred.view(-1)):
                     confusion_matrix[t.long(), p.long()] += 1
@@ -202,4 +202,4 @@ class CNNHandler():
         self.confusion_matrix = torch.zeros(self.config.NUMBER_TARGETS, self.config.NUMBER_TARGETS)
         self.observer.update_config(config, observer_config)
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.config.LEARNING_RATE, momentum=self.config.MOMENTUM)
-        self.criterion = F.nll_loss if self.config.MODELNAME == self.config.MNIST_NAME else nn.CrossEntropyLoss()
+        self.criterion = F.nll_loss if self.config.MODELNAME != self.config.CIFAR10_NAME else nn.CrossEntropyLoss()
