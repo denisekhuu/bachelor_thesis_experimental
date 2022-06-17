@@ -106,11 +106,12 @@ class ClientPlane():
         print("Load default model successfully")
             
     def reset_poisoning_attack(self):
-        for index, client in enumerate(self.clients):
-            if (index+1)%20 == 0:
-                print("{}/{} clients cleaned".format(index+1, len(self.clients)))
-            client.reset_label_flipping_data(from_label=self.config.FROM_LABEL, percentage=self.config.DATA_POISONING_PERCENTAGE)
-        print("Cleaning successfully")
+        if self.config.POISONED_CLIENTS > 0:
+            for index, client in enumerate(self.clients):
+                if (index+1)%20 == 0:
+                    print("{}/{} clients cleaned".format(index+1, len(self.clients)))
+                client.reset_label_flipping_data(from_label=self.config.FROM_LABEL, percentage=self.config.DATA_POISONING_PERCENTAGE)
+            print("Cleaning successfully")
         
     def update_config(self, config, observer_config):
         """
