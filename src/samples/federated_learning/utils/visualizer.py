@@ -30,12 +30,16 @@ class Visualizer():
         :type file: os.path
         """
         import matplotlib.pyplot as plt
+        import os
         shap_numpy = [np.swapaxes(np.swapaxes(s, 1, -1), 1, 2) for s in shap_v]
         test_numpy = np.swapaxes(np.swapaxes(self.shap_util.shap_images.numpy(), 1, -1), 1, 2)
         if file:
-            shap.image_plot(shap_numpy*1000, -test_numpy, show=False)
+            print("make picture")
+            shap.image_plot(shap_numpy, -test_numpy, show=False)
             if not os.path.exists(os.path.dirname(file)):
+                print("make dir")
                 os.makedirs(os.path.dirname(file))
+            print("Make picture")
             plt.savefig(file)
         else: 
             shap.image_plot(shap_numpy, -test_numpy)

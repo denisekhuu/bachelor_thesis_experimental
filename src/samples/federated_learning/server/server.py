@@ -1,5 +1,6 @@
 import torch
 import os
+import copy
 
 from .model_aggregator import ModelAggregator
 from .client_selector import ClientSelector
@@ -22,7 +23,7 @@ class Server(CNNHandler):
         :param new_params: New weights for the neural network
         :type new_params: dict
         """
-        self.net.load_state_dict(new_params, strict=True)
+        self.net.load_state_dict(copy.deepcopy(new_params), strict=True)
         self.net.eval()
         
     def select_clients(self):
