@@ -100,12 +100,12 @@ class CNNHandler():
         if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
             m.reset_parameters()
             
-    def get_shap_values(self):
+    def get_shap_values(self, indices=None):
         """
         Calculate SHAP values and SHAP image predictions 
         """
         e = self.shap_util.set_deep_explainer(self.net)
-        return self.shap_util.get_shap_values(e)
+        return self.shap_util.get_shap_values(e, indices)
     
     def get_shap_predictions(self):
         return self.shap_util.predict(self.net)

@@ -62,13 +62,15 @@ class SHAPUtil():
         """
         return shap.DeepExplainer(net, self.background)
     
-    def get_shap_values(self, e):
+    def get_shap_values(self, e, indices=None):
         """
         Calculate SHAP values based on sample
         :param e: Explainer model
         :type e: shap.DeepExplainer
         return array
         """
+        if indices: 
+            return e.shap_values(self.shap_images[indices])
         return e.shap_values(self.shap_images)
 
     def predict(self, net):
